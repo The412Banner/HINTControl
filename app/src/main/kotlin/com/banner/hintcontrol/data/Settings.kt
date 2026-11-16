@@ -78,6 +78,8 @@ data class AppSettings(
     val rebootSchedule: RebootSchedule = RebootSchedule(),
     val automationEnabled: Boolean = false,
     val automationToken: String = "",
+    /** Android 13+: the notification permission prompt has been shown once (alerts and update notices need it). */
+    val askedNotifications: Boolean = false,
 )
 
 class SettingsRepository(private val store: DataStore<Preferences>, scope: CoroutineScope) {

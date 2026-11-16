@@ -159,7 +159,7 @@ class DemoGatewayClient(
         step()
         val now = clock()
         return MainData(
-            device = DeviceData(friendlyName = "5G Gateway", hardwareVersion = "R01", isEnabled = true, isMeshSupported = true, macId = "11:AC:67:81:18:86", manufacturer = "Demo", model = "G5AR", name = "5G Gateway", role = "gateway", serial = "DEMO00042", softwareVersion = "1.2403.0.12", type = "HSID", updateState = "latest"),
+            device = DeviceData(friendlyName = "5G Gateway", hardwareVersion = "R01", isEnabled = true, isMeshSupported = true, macId = "10:AC:67:81:18:86", manufacturer = "Demo", model = "G5AR", name = "5G Gateway", role = "gateway", serial = "DEMO00042", softwareVersion = "1.2403.0.12", type = "HSID", updateState = "latest"),
             signal = SignalData(fourG = lte(), fiveG = nr(), generic = GenericData(apn = "FBB.HOME", hasIPv6 = true, registration = "registered", roaming = false)),
             time = TimeData(daylightSavings = DaylightSavingsData(isUsed = true), localTime = now / 1000, localTimeZone = "EST5EDT", upTime = (now - bootedAt) / 1000),
         )
@@ -171,7 +171,7 @@ class DemoGatewayClient(
         return CellDataRoot(
             cell = AdvancedCellData(
                 fourG = AdvancedDataLTE(bandwidth = "20M", cqi = 9, earfcn = "66786", ecgi = "31026079478540", mcc = "310", mnc = "260", pci = "63", plmn = "310260", status = true, supportedBands = listOf("b2", "b4", "b5", "b12", "b25", "b41", "b46", "b48", "b66", "b71"), tac = "22233", sector = lte()),
-                fiveG = AdvancedData5G(bandwidth = "100M", cqi = 12, earfcn = "520110", ecgi = "3102605742874905", mcc = "310", mnc = "260", pci = "781", plmn = "310260", status = true, supportedBands = listOf("n25", "n41", "n66", "n71", "n77"), tac = "22233", sector = nr()),
+                fiveG = AdvancedData5G(bandwidth = "100M", cqi = 12, earfcn = "520110", ecgi = "3102605743075609", mcc = "310", mnc = "260", pci = "781", plmn = "310260", status = true, supportedBands = listOf("n25", "n41", "n66", "n71", "n77"), tac = "22233", sector = nr()),
                 generic = GenericData(apn = "FBB.HOME", hasIPv6 = true, registration = "registered", roaming = false),
                 gps = GPSData(latitude = 39.9526, longitude = -75.1652),
             ),

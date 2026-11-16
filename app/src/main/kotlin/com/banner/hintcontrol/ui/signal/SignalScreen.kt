@@ -394,7 +394,7 @@ private fun CellDetails(root: CellDataRoot, onRefresh: () -> Unit) {
             if (c?.fiveG == null && c?.fourG == null) Text("The gateway reports no cell details.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             c?.generic?.let { g ->
                 SectionCard("Network", null) {
-                    InfoRow("Registration", g.registration)
+                    InfoRow("Registration", g.registration?.replaceFirstChar(Char::uppercase))
                     InfoRow("APN", g.apn)
                     InfoRow("Roaming", g.roaming?.let { if (it) "Yes" else "No" })
                     InfoRow("IPv6", g.hasIPv6?.let { if (it) "Yes" else "No" })

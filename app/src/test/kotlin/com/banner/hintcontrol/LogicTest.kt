@@ -6,6 +6,8 @@ import com.banner.hintcontrol.gateway.model.BandConfig
 import com.banner.hintcontrol.gateway.model.SSIDConfig
 import com.banner.hintcontrol.gateway.model.WifiBand
 import com.banner.hintcontrol.gateway.model.WifiConfig
+import com.banner.hintcontrol.ui.components.ChartPoint
+import com.banner.hintcontrol.ui.components.nearestTime
 import com.banner.hintcontrol.ui.components.wifiQrText
 import com.banner.hintcontrol.ui.wifi.WifiChanges
 import com.banner.hintcontrol.ui.wifi.WifiDraft
@@ -24,6 +26,16 @@ import java.time.ZonedDateTime
 
 class LogicTest {
     private fun v(s: String) = AppVersion.parse(s)!!
+
+    @Test
+    fun `chart cursor snaps to the nearest reading`() {
+        // Plot 100 px wide after a 0 px label column; readings at t = 0, 30, 100 (of 0..100).
+        val pts = listOf(ChartPoint(0, 1f), ChartPoint(30, 2f), ChartPoint(100, 3f))
+        assertEquals(30L, nearestTime(pts, 0, 100, 0f, 100, 40f))
+        assertEquals(100L, nearestTime(pts, 0, 100, 0f, 100, 70f))
+        assertEquals(0L, nearestTime(pts, 0, 100, 0f, 100, -20f))
+        assertNull(nearestTime(emptyList(), 0, 100, 0f, 100, 50f))
+    }
 
     @Test
     fun `version ordering`() {

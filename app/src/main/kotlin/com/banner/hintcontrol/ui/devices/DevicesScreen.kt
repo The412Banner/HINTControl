@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.Cable
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DevicesOther
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Refresh
@@ -303,6 +304,9 @@ private fun DeviceList(ui: DevicesUi, onQuery: (String) -> Unit, onFilter: (Devi
                 onValueChange = onQuery,
                 placeholder = { Text("Search name, IP or MAC") },
                 leadingIcon = { Icon(Icons.Outlined.Search, null) },
+                trailingIcon = {
+                    if (ui.query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Outlined.Close, "Clear search") }
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )

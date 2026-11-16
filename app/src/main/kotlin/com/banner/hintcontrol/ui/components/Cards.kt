@@ -76,6 +76,7 @@ fun InfoRow(
     mono: Boolean = false,
     copyable: Boolean = false,
     valueColor: Color = Color.Unspecified,
+    trailing: (@Composable () -> Unit)? = null,
 ) {
     val clipboard = LocalClipboardManager.current
     Row(
@@ -102,6 +103,7 @@ fun InfoRow(
                     Icon(Icons.Outlined.ContentCopy, "Copy $label", modifier = Modifier.size(18.dp))
                 }
             }
+            trailing?.invoke()
         }
     }
 }

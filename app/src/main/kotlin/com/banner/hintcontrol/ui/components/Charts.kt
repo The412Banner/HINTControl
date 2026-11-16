@@ -104,13 +104,13 @@ fun LineChart(
                 .height(height)
                 .pointerInput(series) {
                     val leftPad = 44.dp.toPx()
-                    fun toTime(px: Float): Long = minX + (((px - leftPad) / (size.width - leftPad)).coerceIn(0f, 1f) * (maxX - minX)).toLong()
-                    detectTapGestures { cursorX = if (cursorX == null) toTime(it.x) else null }
+                    detectTapGestures { cursorX = if (cursorX == null) nearestTime(all, minX, maxX, leftPad, size.width, it.x) else null }
                 }
                 .pointerInput(series) {
                     val leftPad = 44.dp.toPx()
-                    fun toTime(px: Float): Long = minX + (((px - leftPad) / (size.width - leftPad)).coerceIn(0f, 1f) * (maxX - minX)).toLong()
-                    detectDragGestures(onDragEnd = {}, onDragCancel = {}) { change, _ -> cursorX = toTime(change.position.x) }
+                    detectDragGestures(onDragEnd = {}, onDragCancel = {}) { change, _ ->
+                        cursorX = nearestTime(all, minX, maxX, leftPad, size.width, change.position.x)
+                    }
                 },
         ) {
             val leftPad = 44.dp.toPx()
@@ -198,6 +198,13 @@ fun Sparkline(values: List<Float>, color: Color, modifier: Modifier = Modifier) 
         }
         drawPath(path, color, style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     }
+}
+
+/** Time of the reading closest to a touch, so the cursor line, dots and readout all show the same sample. */
+internal fun nearestTime(points: List<ChartPoint>, minX: Long, maxX: Long, leftPad: Float, width: Int, touchX: Float): Long? {
+    if (points.isEmpty()) return null
+    val t = minX + (((touchX - leftPad) / (width - leftPad)).coerceIn(0f, 1f) * (maxX - minX)).toLong()
+    return points.minBy { abs(it.x - t) }.x
 }
 
 private fun niceStep(raw: Float): Float {

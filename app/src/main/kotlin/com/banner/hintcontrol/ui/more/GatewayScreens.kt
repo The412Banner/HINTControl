@@ -179,12 +179,11 @@ fun GatewayInfoBody(ui: GatewayInfoUi, onLogin: (String, Boolean) -> Unit) {
 @Composable
 private fun SecretRow(label: String, value: String?) {
     var shown by rememberSaveable(label) { mutableStateOf(false) }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        InfoRow(label, value?.let { if (shown) it else Report.mask(it) }, Modifier.weight(1f), mono = true, copyable = shown)
-        if (value != null) IconButton(onClick = { shown = !shown }) {
-            Icon(if (shown) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, if (shown) "Hide $label" else "Show $label")
+    InfoRow(label, value?.let { if (shown) it else Report.mask(it) }, mono = true, copyable = shown, trailing = {
+        if (value != null) IconButton(onClick = { shown = !shown }, modifier = Modifier.size(36.dp)) {
+            Icon(if (shown) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, if (shown) "Hide $label" else "Show $label", modifier = Modifier.size(20.dp))
         }
-    }
+    })
 }
 
 @Composable

@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.QrCode2
@@ -59,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.banner.hintcontrol.gateway.model.BandConfig
@@ -385,50 +389,66 @@ private fun NetworkEditor(
     val nameOk = WifiRules.isValidSsid(s.ssidName)
     val keyOk = WifiRules.isValidWpaKey(s.wpaKey)
     val bandsOk = !s.canEditFrequencyAndGuest || WifiBand.entries.any { s.onBand(it) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.widthIn(max = 560.dp).padding(16.dp),
-        title = { Text(if (isNew) "New network" else "Edit network") },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = s.ssidName.orEmpty(),
-                    onValueChange = { s = s.copy(ssidName = it) },
-                    label = { Text("Network name") },
-                    singleLine = true,
-                    isError = s.ssidName != null && !nameOk,
-                    supportingText = { Text("${s.ssidName.orEmpty().encodeToByteArray().size}/32 bytes") },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                PasswordField(
-                    value = s.wpaKey.orEmpty(),
-                    onValueChange = { s = s.copy(wpaKey = it) },
-                    label = "Password",
-                    isError = s.wpaKey != null && !keyOk,
-                    supporting = "8–63 characters, letters, numbers and symbols",
-                )
-                Dropdown("Security", EncryptionVersions.all, s.encryptionVersion ?: EncryptionVersions.WPA2_WPA3, { s = s.copy(encryptionVersion = it) }, Modifier.fillMaxWidth())
-                Dropdown("Encryption", EncryptionModes.all, s.encryptionMode ?: EncryptionModes.AES, { s = s.copy(encryptionMode = it) }, Modifier.fillMaxWidth())
-                if (s.canEditFrequencyAndGuest) {
-                    Text("Bands", style = MaterialTheme.typography.labelLarge)
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        WifiBand.entries.filter { it != WifiBand.SixGig || hasSixGhz }.forEach { band ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(s.onBand(band), { s = s.withBand(band, it) })
-                                Text(band.label)
+    val canSave = nameOk && keyOk && bandsOk
+    // Full screen rather than an AlertDialog: this form is taller than the space above the keyboard,
+    // and a tall AlertDialog ended up drawn over the keyboard (seen on the Pocket FIT, Android 14).
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text(if (isNew) "New network" else "Edit network") },
+                        navigationIcon = { IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, "Cancel") } },
+                        actions = { TextButton(onClick = { onSave(s) }, enabled = canSave) { Text("Done") } },
+                    )
+                },
+            ) { padding ->
+                Box(
+                    Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).imePadding(),
+                    contentAlignment = Alignment.TopCenter,
+                ) {
+                    Column(
+                        Modifier.widthIn(max = 640.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        OutlinedTextField(
+                            value = s.ssidName.orEmpty(),
+                            onValueChange = { s = s.copy(ssidName = it) },
+                            label = { Text("Network name") },
+                            singleLine = true,
+                            isError = s.ssidName != null && !nameOk,
+                            supportingText = { Text("${s.ssidName.orEmpty().encodeToByteArray().size}/32 bytes") },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        PasswordField(
+                            value = s.wpaKey.orEmpty(),
+                            onValueChange = { s = s.copy(wpaKey = it) },
+                            label = "Password",
+                            isError = s.wpaKey != null && !keyOk,
+                            supporting = "8–63 characters, letters, numbers and symbols",
+                        )
+                        Dropdown("Security", EncryptionVersions.all, s.encryptionVersion ?: EncryptionVersions.WPA2_WPA3, { s = s.copy(encryptionVersion = it) }, Modifier.fillMaxWidth())
+                        Dropdown("Encryption", EncryptionModes.all, s.encryptionMode ?: EncryptionModes.AES, { s = s.copy(encryptionMode = it) }, Modifier.fillMaxWidth())
+                        if (s.canEditFrequencyAndGuest) {
+                            Text("Bands", style = MaterialTheme.typography.labelLarge)
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                WifiBand.entries.filter { it != WifiBand.SixGig || hasSixGhz }.forEach { band ->
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Checkbox(s.onBand(band), { s = s.withBand(band, it) })
+                                        Text(band.label)
+                                    }
+                                }
                             }
+                            if (!bandsOk) Text("Pick at least one band.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                         }
+                        ToggleRow("Visible", "Broadcast the network name", s.isBroadcastEnabled != false) { s = s.copy(isBroadcastEnabled = it) }
+                        if (s.canEditFrequencyAndGuest) ToggleRow("Guest network", null, s.guest == true) { s = s.copy(guest = it) }
+                        Button(onClick = { onSave(s) }, enabled = canSave, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) { Text("Done") }
                     }
-                    if (!bandsOk) Text("Pick at least one band.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
-                ToggleRow("Visible", "Broadcast the network name", s.isBroadcastEnabled != false) { s = s.copy(isBroadcastEnabled = it) }
-                if (s.canEditFrequencyAndGuest) ToggleRow("Guest network", null, s.guest == true) { s = s.copy(guest = it) }
             }
-        },
-        confirmButton = { FilledTonalButton(onClick = { onSave(s) }, enabled = nameOk && keyOk && bandsOk) { Text("Done") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-    )
+        }
+    }
 }
 
 @Composable

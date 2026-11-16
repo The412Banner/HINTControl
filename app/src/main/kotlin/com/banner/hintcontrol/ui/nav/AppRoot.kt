@@ -1,5 +1,10 @@
 package com.banner.hintcontrol.ui.nav
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Badge
@@ -17,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -81,6 +88,19 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
             back = { if (!nav.popBackStack()) nav.goTop(OverviewRoute) },
             askReboot = { confirmReboot = true },
         )
+    }
+
+    val context = LocalContext.current
+    val notificationPrompt = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    LaunchedEffect(Unit) {
+        // Ask once, after setup: alerts and "update available" notices are silent without it on Android 13+.
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
+            !container.settings.current().askedNotifications
+        ) {
+            container.settings.update { it.copy(askedNotifications = true) }
+            notificationPrompt.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     LaunchedEffect(link) {
