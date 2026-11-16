@@ -10,6 +10,7 @@ import com.banner.hintcontrol.data.RebootController
 import com.banner.hintcontrol.data.SecretCipher
 import com.banner.hintcontrol.data.SettingsRepository
 import com.banner.hintcontrol.data.StatusRepository
+import com.banner.hintcontrol.data.SpeedTestStore
 import com.banner.hintcontrol.data.SummaryStore
 import com.banner.hintcontrol.data.appDataStore
 import com.banner.hintcontrol.data.db.HistoryDatabase
