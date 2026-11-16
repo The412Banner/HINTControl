@@ -8,12 +8,18 @@ Newest entry first. Times are US Eastern.
 - Open: #82 parental controls (needs a T-Life schedule to learn the format), Wi-Fi save + reboot on the G5AR (ask first), update notification seen naturally, widget + tile on a device.
 
 ## Lessons learned (don't repeat these)
+- Back up before deleting, and make the delete depend on the backup succeeding (`backup && delete`); run git refspec loops in bash, not zsh (zsh treats `$var:r…` as a modifier and doesn't word-split `set -- $pair`).
 - Don't declare a permission the app never requests: Android 17 treated Hint Plus's declared-but-unrequested ACCESS_LOCAL_NETWORK as not granted and blocked the gateway on newer phones (apps targeting ≤36 get it implicitly only when they don't declare it).
 - Count upload bytes only when the server confirms them: Android's send buffer takes megabytes at once, so counting at write time reports the buffer, not the link (first real speed test showed 0 Mbps up).
 - Every new class in the app module needs its import where it's used (AppContainer uses explicit imports); the app module can't be compiled locally, so a missing import costs a CI round.
 - Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
+
+## 2026-11-16 ~10:15 EST — Demo restart glitch fix + branch tidy (fix/demo-reboot, in CI)
+**Why:** user: "yes fix the demo glitch and tidy the branches".
+**Demo fix ca0c513 (CI 43892933902):** DemoGatewayClient takes a DemoBootTimeStore; the app keeps the demo's boot time in SharedPreferences "demo", so restarting/updating the app no longer looks like a gateway restart; a demo reboot still updates it. Test `demo uptime survives an app restart`; gateway tests 43/43 locally. Not released (waits for the next release).
+**Branch tidy:** deleted feat/android-compose, feat/g5ar-items, feat/speed-test, feat/upstream-fixes-1.0.1 (all contained in main) and testing-caching (the original author's old experiment copied by the fork). **Mistake:** the backup pushes failed first (zsh read `$b:refs` as the `:r` modifier) and the delete ran anyway because it wasn't chained on the backups. Recovered right away: backups recreated from the known tip commits — refs/backup/20261116/branch/{feat/android-compose 1940215, feat/g5ar-items bb6c9c7, feat/speed-test 3a8b66b, feat/upstream-fixes-1.0.1 55bbb0d} (all ancestors of main) and testing-caching 7336eb5b (fetched from zacharee/HINTControl). Nothing lost. Remaining branches: main, fix/demo-reboot.
 
 ## 2026-11-16 ~09:00–10:00 EST — G5AR items (#120, #133, #82) + Android 17 not-found fix → v1.1.1 (main, released)
 **Why:** user: "do the 3 G5AR items next".
