@@ -32,7 +32,7 @@ data class LiveState(
  * settings; [setFastMode] switches to one reading per second (placement helper).
  */
 class StatusRepository(
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val session: GatewaySession,
     private val settings: SettingsRepository,
     private val history: HistoryRepository,
@@ -85,14 +85,16 @@ class StatusRepository(
             val main = session.status { it.mainData() }
             val now = System.currentTimeMillis()
             _state.value = LiveState(profile.id, main, now, null, false)
-            val s = settings.settings.value
-            // History and widget data are extras; a problem there must not look like a gateway error.
-            runCatching { history.observe(profile.id, main, record = s.recordHistory, minIntervalMs = FOREGROUND_RECORD_MS, now = now) }
-                .onFailure { Log.w(TAG, "history: ${it.javaClass.simpleName}: ${it.message}") }
-            runCatching { summaries.save(main.toSummary(profile.name, now)) }
-            if (now - lastSummaryPush > 60_000) {
-                lastSummaryPush = now
-                onSummary()
+            val record = settings.settings.value.recordHistory
+            val push = now - lastSummaryPush > 60_000
+            if (push) lastSummaryPush = now
+            // Runs in the app scope: polling stops (and is cancelled) as soon as no screen is
+            // watching, which must not cut a history write short. Errors here are not gateway errors.
+            scope.launch {
+                runCatching { history.observe(profile.id, main, record = record, minIntervalMs = FOREGROUND_RECORD_MS, now = now) }
+                    .onFailure { Log.w(TAG, "history: ${it.javaClass.simpleName}: ${it.message}") }
+                runCatching { summaries.save(main.toSummary(profile.name, now)) }
+                if (push) onSummary()
             }
         } catch (e: CancellationException) {
             throw e
