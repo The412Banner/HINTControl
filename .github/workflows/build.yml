@@ -1,6 +1,9 @@
 name: Build
 
 on:
+  push:
+    branches: ["feat/**", "fix/**"]
+    paths-ignore: ["PROGRESS_LOG.md", "README.md", "release-notes/**", "docs/**"]
   workflow_dispatch:
     inputs:
       release:
