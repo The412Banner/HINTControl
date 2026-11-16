@@ -6,11 +6,16 @@ Newest entry first. Times are US Eastern.
 - Branch `feat/android-compose` (main = upstream zacharee/HINTControl 1.17.3, untouched).
 - Modules: `gateway/` (plain Kotlin; 36 tests pass locally with JDK 21: `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64 ./gradlew -PgatewayOnly=true :gateway:test`) and `app/` (Android, Compose; CI only — no Android SDK on the device).
 - CI: `.github/workflows/build.yml` runs on push to `feat/**`/`fix/**` (forks can't dispatch workflows that aren't on the default branch). Artifacts: `HINTControl-apk` (testkey v1/v2/v3 APK + .sha256) and `screenshots` (Robolectric renders of every screen with demo data).
-- First app compile: run 43810534903 on 2886e943 (in progress at time of writing).
+- CI runs: 43810534903 (2886e943) FAILED compile (SectionCard parameter order + Glance import); 43810959412 (6ecb8760) GREEN — all steps, APK signed v1+v2+v3 (cert a40da80a…f5dc), 16 screenshots; 43811713962 (08ac4701) = screenshot-review fixes, running.
 - Next: fix compile errors, review screenshots, stage APK in /sdcard/Download, ask before install, prerelease v1.0.0-pre1 from the tested APK (gh release create by hand, so the released file == the tested file).
 
 ## Lessons learned (don't repeat these)
 - (none yet)
+
+## 2026-11-16 — First green build + screenshot review (feat/android-compose, CI-green, NOT device-tested)
+**CI:** 43810959412 on 6ecb8760 green. aapt2: package com.banner.hintcontrol, versionCode 1, versionName 1.0.0-pre1, label "Banners HINT". Gateway tests 36 + LogicTest 7 pass.
+**Screenshot review (Robolectric, demo data):** Home, Home dark, landscape, Signal live/history/cell, Devices, Devices login, Wi-Fi, More, Gateway details, Updates, Settings, Setup found/not found, icon — all render. Found and fixed in 08ac4701: Live score card not full width (cards now fill width), detail-row values shifted by the copy button, band-change rows overlapped; test clock now real time; added nav-shell screenshots (bottom bar portrait, rail landscape).
+**Added after:** R8 keep rules for the widget ActionCallback and workers (created by name at runtime).
 
 ## 2026-11-16 — App module written (feat/android-compose, compiling in CI)
 **Built:** a8a240be (app) + 2886e943 (CI push trigger). Not compiled before this run.
