@@ -47,7 +47,7 @@ jobs:
         run: ./gradlew --no-daemon :gateway:test
 
       - name: App unit tests
-        run: ./gradlew --no-daemon :app:testDebugUnitTest --tests 'com.banner.hintcontrol.LogicTest'
+        run: ./gradlew --no-daemon :app:testDebugUnitTest --tests 'com.banner.hintcontrol.LogicTest' --tests 'com.banner.hintcontrol.ContainerTest'
 
       - name: Build APK
         run: ./gradlew --no-daemon :app:assembleRelease --stacktrace

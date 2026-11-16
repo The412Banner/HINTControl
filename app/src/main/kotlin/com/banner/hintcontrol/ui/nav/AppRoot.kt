@@ -7,6 +7,7 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -148,7 +150,10 @@ fun AppNavigationSuite(
     onSelect: (TopDestination) -> Unit,
     content: @Composable () -> Unit,
 ) {
+    val config = LocalConfiguration.current
+    val rail = config.screenWidthDp >= 840 || (config.screenWidthDp >= 600 && config.screenWidthDp > config.screenHeightDp)
     NavigationSuiteScaffold(
+        layoutType = if (rail) NavigationSuiteType.NavigationRail else NavigationSuiteType.NavigationBar,
         navigationSuiteItems = {
             TopDestination.entries.forEach { d ->
                 val selected = isSelected(d)
