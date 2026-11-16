@@ -14,6 +14,11 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~05:00 EST — v1.0.0-pre2 release + in-app update test (feat/android-compose, in progress)
+**Why:** user picked option A: "publish pre2 and update through the app".
+**Plan:** release-cut commit 93b6e138 (versionCode 2, 1.0.0-pre2, release-notes/v1.0.0-pre2.md) → CI 43844143493 → verify APK (vc 2, vn 1.0.0-pre2, v1/v2/v3) → `gh release create v1.0.0-pre2 --target 93b6e1384b7a0cbee9b87c1210a641e16aaf44af --prerelease` with APK + .sha256 → verify → on the FIT open the installed pre1 → More → Updates → Download & install → allow unknown sources → Android confirm → check installed version + base.apk hash == release asset.
+**Resume point:** if the session dies: check `gh release view v1.0.0-pre2 -R The412Banner/HINTControl`; on the FIT `dumpsys package com.banner.hintcontrol | grep versionName`; bring Termux back; tell root-d8 "done".
+
 ## 2026-11-16 04:30–04:55 EST — Device test on the Pocket FIT, demo mode (feat/android-compose, in progress)
 **Why:** user said "install it and test it in demo mode".
 **Installed:** 25b021a3 (v1.0.0-pre1), installed base.apk sha256 764fed21… == staged. Cold start 155 ms.
