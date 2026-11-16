@@ -3,23 +3,23 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- Branch `feat/android-compose` (main = upstream zacharee/HINTControl 1.17.3, untouched; merge = user's go after device test).
-- Release candidate: **25b021a34c444afd6596f4886144998fdf5ea3d1**, CI run **43814242612** green (gateway 36 tests, LogicTest 7, ContainerTest end-to-end, R8 release APK, apksigner v1+v2+v3 true, cert a40da80a…f5dc, 18 screenshots).
-- APK `HINTControl-v1.0.0-pre1-25b021a3.apk`, 3,329,576 bytes, sha256 `764fed21464e19150ccd85709fa7440deda8883f8a730e2556202a52825557b3`. Staged on the Pocket FIT: `/sdcard/Download/HINTControl-android-compose-25b021a3.apk` (hash host == device). NOT installed (needs the user's yes). Upstream app dev.zwander.arcadyankvd21control is installed on the FIT; ours is a separate package.
-- **v1.0.0-pre1 PUBLISHED as pre-release** (https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0-pre1): tag → 25b021a34c444afd6596f4886144998fdf5ea3d1, pre-release, not Latest (no stable exists), assets = the staged APK + .sha256 (re-downloaded, sha256 764fed21… matches), notes == release-notes/v1.0.0-pre1.md.
-- Next: user installs/tests (or says yes to my installing on the FIT). Merge to main (backup ref first) and stable 1.0.0 only on the user's word. Untested: everything on real gateway hardware; on-device: widget, tile, scheduled reboot alarm, updater install flow, notifications.
+- **Stable v1.0.0 (Latest)** published 2026-11-16 07:02 EST, tag → 063d94715e3c1c196f4fcebe038e76e95b0c2e65; main = feat/android-compose (fast-forwarded from upstream 1.17.3; backup refs/backup/20261116/main-before-android-compose).
+- App name **Hint Plus**, app ID com.banner.hintcontrol. Tested on a real Arcadyan TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices. Pocket FIT runs 1.0.0-pre5.
+- Open: Wi-Fi settings + reboot on the real G5AR (ask first, cuts internet), update notification seen naturally, widget and Quick Settings tile on a device, other gateway models.
 
 ## Lessons learned (don't repeat these)
 - Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
-## 2026-11-16 ~06:50 EST — Stable v1.0.0 + README rewrite + merge to main (in progress)
+## 2026-11-16 ~06:50–07:05 EST — Stable v1.0.0 + README rewrite + merge to main (main, released)
 **Why:** user: "updated to pre5, devices show now, can you release a stable release and rewrite the repo read me accurately, professionally and make sure to credit the original upstream work. also list what this app added and what makes it different simply" + "make sure everything is on the main branch also".
 **Verified first:** FIT pre5 installed (hash 25bf4132… == release); app DB has 10 devices for the real G5AR profile (fix device-proven), no crash.
 **README (0095868):** HINT Control / Zachary Wander credit up front; gateway table with real-hardware column (TMO-G5AR ✓); "What Hint Plus adds" and "What's different" checked against HINT Control 1.17.3 source (upstream already has: widget, snapshot history charts, in-app updater with signing-cert check, Tasker plugin → not listed as new); fixes incl. #123 credit (cmarker84, fitzmorrispr); permissions; automation; building; screenshots (demo data, docs/screenshots).
 **Release commit:** 063d94715e3c1c196f4fcebe038e76e95b0c2e65 (versionCode 6, 1.0.0, release-notes/v1.0.0.md), CI 43862124937.
-**Plan:** green → verify APK → backup ref refs/backup/20261116/main-before-android-compose (= f5b14a5) → fast-forward main → `gh release create v1.0.0 --target 063d9471… --latest` → verify (Latest, tag, assets, notes) → main == feat (only PROGRESS_LOG may differ from the tag).
+**Done 07:02 EST:** CI 43862124937 green (APK HintPlus-v1.0.0-063d9471.apk, vc 6, 1.0.0, label Hint Plus, v1/v2/v3, cert a40da80a, sha256 e0481e64f68e3f7f9ff235b9ef1509b80647b6e481a08e3f6b7a144cf7e6b30c). Backup ref refs/backup/20261116/main-before-android-compose = f5b14a5 (upstream 1.17.3). main fast-forwarded f5b14a5 → f82863f (== feat; differs from the release commit only in PROGRESS_LOG.md). **Stable release v1.0.0 = Latest**: https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0 — tag → 063d94715e3c1c196f4fcebe038e76e95b0c2e65 (on main), not prerelease, assets APK + .sha256, re-download matches, notes == release-notes/v1.0.0.md (+ final newline). Front page shows the new README; screenshots load (raw 200).
+**Proof level:** stable = pre5 code (device-proven on the real TMO-G5AR: login, status, devices) + README + version bump; the 1.0.0 APK itself not installed yet (FIT runs pre5; the app will offer 1.0.0).
+**Resume point:** work continues on feat/ branches off main. Open: Wi-Fi settings + reboot on the real G5AR (ask first), update notification seen naturally, widget/tile, demo false "RebootDetected" after app updates.
 
 ## 2026-11-16 ~06:00–06:35 EST — First real gateway (feat/android-compose, pre5 published with G5AR device-list fix)
 **Why:** user: "updated to pre4, shows Hint Plus, I am on my T-Mobile gateway now also".
