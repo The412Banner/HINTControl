@@ -14,6 +14,12 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~05:20 EST — v1.0.0-pre3 (feat/android-compose, in progress)
+**Why:** user: "yes put the widget fix in pre3" (widget said "Gateway offline" when the phone is simply away from the gateway's network). Plus the bugs found in the pre1 → pre2 update test.
+**Built:** 7b244742 — StatusSummary.away (markOffline(name, host) checks NetworkInfo.onGatewayNetwork; demo excluded), widget "Not on gateway network", tile "Not on its network"; Updates re-checks install permission on resume (LifecycleResumeEffect); MarkdownLite renders > quotes; clearDownloads() at app start; bottom bar keeps the last tab selected on sub-screens; More badge/row also for ReadyToInstall. ContainerTest asserts away true/false. CI 43846422004 running.
+**Plan:** green → release commit (vc 3, 1.0.0-pre3, release-notes/v1.0.0-pre3.md) → CI → publish prerelease → update FIT pre2 → pre3 through the app (ask/check screen first; user is active on the device).
+**Resume point:** FIT runs pre2 (93b6e138, installed via the app). CI 43846422004 for 7b244742.
+
 ## 2026-11-16 ~05:00–05:07 EST — v1.0.0-pre2 release + in-app update test (feat/android-compose, pre2 published + device-proven update)
 **Why:** user picked option A: "publish pre2 and update through the app".
 **Plan:** release-cut commit 93b6e138 (versionCode 2, 1.0.0-pre2, release-notes/v1.0.0-pre2.md) → CI 43844143493 → verify APK (vc 2, vn 1.0.0-pre2, v1/v2/v3) → `gh release create v1.0.0-pre2 --target 93b6e1384b7a0cbee9b87c1210a641e16aaf44af --prerelease` with APK + .sha256 → verify → on the FIT open the installed pre1 → More → Updates → Download & install → allow unknown sources → Android confirm → check installed version + base.apk hash == release asset.
