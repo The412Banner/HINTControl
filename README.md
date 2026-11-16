@@ -76,7 +76,7 @@ Compared with HINT Control:
 
 | Permission | Why |
 | --- | --- |
-| Internet, network state, local network | Talk to the gateway; check for app updates on GitHub; run speed tests |
+| Internet, network state | Talk to the gateway; check for app updates on GitHub; run speed tests |
 | Wi-Fi state | Show the phone's Wi-Fi link speed next to speed test results |
 | Notifications | Alerts and update notices (you're asked once) |
 | Exact alarms, start at boot, foreground service | Scheduled reboots at the time you set, also after the phone restarts |
