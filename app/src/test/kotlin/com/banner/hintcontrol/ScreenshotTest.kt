@@ -1,5 +1,11 @@
 package com.banner.hintcontrol
 
+import com.banner.hintcontrol.data.FirmwareInfo
+import com.banner.hintcontrol.data.FirmwareJob
+import com.banner.hintcontrol.data.FirmwarePhase
+import com.banner.hintcontrol.gateway.FirmwareUploadResult
+import com.banner.hintcontrol.ui.more.FirmwareBody
+import com.banner.hintcontrol.ui.more.FirmwareUi
 import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -237,6 +243,23 @@ class ScreenshotTest {
         androidx.compose.foundation.layout.Column(Modifier.padding(top = 24.dp)) {
             UpdatesBody(UpdateState.Available(release), AppSettings(includePrereleases = true, lastUpdateCheck = now), true, {}, {}, { _, _ -> }, {}, {}, {}, {})
         }
+    }
+
+    private val firmwareFile = FirmwareInfo("content://x/fw.bin", "TMO-G5AR_1.00.07.bin", 48_234_496, "3f9a1c0e5b7d24e8a61f0c93b2d4e7a85c1b6d0f9e2a4c7b8d3e6f1a0b5c9d2e")
+
+    @Test
+    fun firmwareReady() = shot("23-firmware-ready") {
+        FirmwareBody(FirmwareUi(model = "TMO-G5AR", firmware = "1.00.06", picked = firmwareFile), {}, {}, {})
+    }
+
+    @Test
+    fun firmwareSending() = shot("24-firmware-sending") {
+        FirmwareBody(FirmwareUi(model = "TMO-G5AR", firmware = "1.00.06", job = FirmwareJob(firmwareFile, FirmwarePhase.Uploading, startedAt = now, sent = 20_000_000, before = "1.00.06")), {}, {}, {})
+    }
+
+    @Test
+    fun firmwareDone() = shot("25-firmware-done", dark = true) {
+        FirmwareBody(FirmwareUi(model = "TMO-G5AR", firmware = "1.00.07", job = FirmwareJob(firmwareFile, FirmwarePhase.Done, startedAt = now, sent = firmwareFile.size, before = "1.00.06", after = "1.00.07", answer = FirmwareUploadResult.Accepted, sawOffline = true)), {}, {}, {})
     }
 
     @Test

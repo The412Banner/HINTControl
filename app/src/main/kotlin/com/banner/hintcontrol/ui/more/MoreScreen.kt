@@ -177,7 +177,7 @@ fun EventList(events: List<GatewayEvent>) {
         items(events, key = { it.id }) { e ->
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 val tint = when (e.type) {
-                    EventType.Offline, EventType.ScheduledRebootFailed, EventType.WeakSignal -> MaterialTheme.colorScheme.error
+                    EventType.Offline, EventType.ScheduledRebootFailed, EventType.WeakSignal, EventType.FirmwareSendFailed -> MaterialTheme.colorScheme.error
                     EventType.Online, EventType.RebootDetected -> MaterialTheme.colorScheme.primary
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
@@ -202,7 +202,7 @@ private fun eventIcon(t: EventType) = when (t) {
     EventType.NewDevice -> Icons.Outlined.Badge
     EventType.WifiSaved -> Icons.Outlined.Settings
     EventType.LoginChanged -> Icons.Outlined.Key
-    EventType.FirmwareUpdated -> Icons.Outlined.SystemUpdate
+    EventType.FirmwareUpdated, EventType.FirmwareSent, EventType.FirmwareSendFailed -> Icons.Outlined.SystemUpdate
 }
 
 @Composable

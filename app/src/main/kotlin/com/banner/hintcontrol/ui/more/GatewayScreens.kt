@@ -51,6 +51,8 @@ import com.banner.hintcontrol.data.Report
 import com.banner.hintcontrol.data.db.EventType
 import com.banner.hintcontrol.data.needsLogin
 import com.banner.hintcontrol.data.userMessage
+import com.banner.hintcontrol.gateway.FirmwareSupport
+import com.banner.hintcontrol.gateway.GatewayKind
 import com.banner.hintcontrol.gateway.model.CellDataRoot
 import com.banner.hintcontrol.gateway.model.MainData
 import com.banner.hintcontrol.gateway.model.SimDataRoot
@@ -61,6 +63,7 @@ import com.banner.hintcontrol.ui.components.PasswordField
 import com.banner.hintcontrol.ui.components.SectionCard
 import com.banner.hintcontrol.ui.components.SettingRow
 import com.banner.hintcontrol.ui.components.SubScreen
+import com.banner.hintcontrol.ui.nav.FirmwareRoute
 import com.banner.hintcontrol.ui.nav.LocalAppActions
 import com.banner.hintcontrol.ui.nav.containerViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +83,12 @@ data class GatewayInfoUi(
     val needsLogin: Boolean = false,
     val loginBusy: Boolean = false,
     val loginError: String? = null,
-)
+    val kind: GatewayKind? = null,
+    val developerMode: Boolean = false,
+) {
+    /** The firmware upload is a Developer option, offered where the gateway's own page has it. */
+    val firmwareUpload: Boolean get() = developerMode && kind != null && FirmwareSupport.isSupported(kind, main?.device?.model)
+}
 
 class GatewayInfoViewModel(private val c: AppContainer) : ViewModel() {
     private val _ui = MutableStateFlow(GatewayInfoUi())
@@ -93,7 +101,16 @@ class GatewayInfoViewModel(private val c: AppContainer) : ViewModel() {
     fun load() {
         viewModelScope.launch {
             val p = c.profiles.active.value
-            _ui.update { it.copy(name = p?.name ?: "Gateway", host = p?.host.orEmpty(), kindLabel = p?.kind?.label.orEmpty(), main = c.status.state.value.main) }
+            _ui.update {
+                it.copy(
+                    name = p?.name ?: "Gateway",
+                    host = p?.host.orEmpty(),
+                    kindLabel = p?.kind?.label.orEmpty(),
+                    kind = p?.kind,
+                    developerMode = c.settings.settings.value.developerMode,
+                    main = c.status.state.value.main,
+                )
+            }
             runCatching { c.session.status { it.mainData() } }.onSuccess { m -> _ui.update { it.copy(main = m) } }
             try {
                 val sim = c.session.authed { it.simData() }
@@ -136,12 +153,12 @@ fun GatewayInfoScreen() {
             }) { Icon(Icons.Outlined.Share, "Share report") }
         },
     ) {
-        GatewayInfoBody(ui, vm::login)
+        GatewayInfoBody(ui, onFirmware = { actions.navigate(FirmwareRoute) }, onLogin = vm::login)
     }
 }
 
 @Composable
-fun GatewayInfoBody(ui: GatewayInfoUi, onLogin: (String, Boolean) -> Unit) {
+fun GatewayInfoBody(ui: GatewayInfoUi, onFirmware: () -> Unit = {}, onLogin: (String, Boolean) -> Unit) {
     val d = ui.main?.device
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionCard("Device", Icons.Outlined.Router) {
@@ -157,6 +174,9 @@ fun GatewayInfoBody(ui: GatewayInfoUi, onLogin: (String, Boolean) -> Unit) {
             InfoRow("Mesh support", d?.isMeshSupported?.let { if (it) "Yes" else "No" })
             InfoRow("Uptime", Format.uptime(ui.main?.time?.upTime))
             ui.main?.time?.localTimeZone?.let { InfoRow("Time zone", it) }
+            if (ui.firmwareUpload) {
+                TextButton(onClick = onFirmware) { Text("Install firmware file") }
+            }
         }
         SectionCard("SIM", Icons.Outlined.SimCard) {
             val sim = ui.sim?.sim

@@ -54,6 +54,7 @@ import com.banner.hintcontrol.ui.reboot.RebootProgressDialog
 import com.banner.hintcontrol.ui.setup.SetupScreen
 import com.banner.hintcontrol.ui.signal.SignalScreen
 import com.banner.hintcontrol.ui.speed.SpeedTestScreen
+import com.banner.hintcontrol.ui.more.FirmwareScreen
 import com.banner.hintcontrol.ui.wifi.WifiScreen
 import com.banner.hintcontrol.update.UpdateState
 
@@ -155,6 +156,7 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
                 composable<AdminLoginRoute> { AdminLoginScreen() }
                 composable<AutomationRoute> { AutomationScreen() }
                 composable<SpeedTestRoute> { SpeedTestScreen() }
+                composable<FirmwareRoute> { FirmwareScreen() }
             }
         }
     }

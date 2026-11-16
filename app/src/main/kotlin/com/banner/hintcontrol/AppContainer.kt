@@ -5,6 +5,7 @@ import android.content.Context
 import android.service.quicksettings.TileService
 import com.banner.hintcontrol.data.GatewaySession
 import com.banner.hintcontrol.data.FirmwareMemory
+import com.banner.hintcontrol.data.FirmwareUploader
 import com.banner.hintcontrol.data.HistoryRepository
 import com.banner.hintcontrol.data.Observation
 import com.banner.hintcontrol.data.ProfileRepository
@@ -45,6 +46,8 @@ class AppContainer(
         private val prefs = context.getSharedPreferences("demo", Context.MODE_PRIVATE)
         override fun load(): Long? = prefs.getLong("booted_at", 0L).takeIf { it > 0 }
         override fun save(bootedAt: Long) = prefs.edit().putLong("booted_at", bootedAt).apply()
+        override fun loadFirmware(): String? = prefs.getString("firmware", null)
+        override fun saveFirmware(version: String) = prefs.edit().putString("firmware", version).apply()
     })
     val summaries = SummaryStore(context)
     val notifier = Notifier(context)
@@ -53,6 +56,8 @@ class AppContainer(
     val reboots = RebootController(scope, session, history)
     val updates = UpdateRepository(context, settings)
     val speedTests = SpeedTestStore(context)
+
+    val firmware = FirmwareUploader(scope, session, history, onObservation = ::notifyFirmware)
 
     /** Notifies when a gateway's firmware version changed (logged in the event log either way). */
     fun notifyFirmware(gatewayName: String, obs: Observation) {

@@ -60,6 +60,8 @@ enum class EventType(val label: String) {
     WeakSignal("Weak signal"),
     LoginChanged("Admin login changed"),
     FirmwareUpdated("Firmware updated"),
+    FirmwareSent("Firmware file sent"),
+    FirmwareSendFailed("Firmware upload failed"),
 }
 
 @Entity(tableName = "events", indices = [Index(value = ["profileId", "time"])])
