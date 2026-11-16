@@ -3,6 +3,9 @@ package com.banner.hintcontrol.gateway.tmi
 
 import com.banner.hintcontrol.gateway.GatewayAddress
 import com.banner.hintcontrol.gateway.GatewayCapabilities
+import com.banner.hintcontrol.gateway.FirmwareBody
+import com.banner.hintcontrol.gateway.FirmwareFile
+import com.banner.hintcontrol.gateway.FirmwareUploadResult
 import com.banner.hintcontrol.gateway.GatewayClient
 import com.banner.hintcontrol.gateway.GatewayException
 import com.banner.hintcontrol.gateway.GatewayHttp
@@ -38,6 +41,7 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.NoRouteToHostException
 import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 /** Arcadyan KVD21 / TMOG4AR, Sagemcom FAST 5688W, Sercomm TMOG4SE ("TMI/v1" API). */
 class TmiGatewayClient(
@@ -67,6 +71,10 @@ class TmiGatewayClient(
 
     fun url(path: String) = root + path.trimStart('/')
 
+    /** The gateway's own web page logs in and uploads firmware on port 80, not 8080. */
+    private val webRoot: String
+        get() = baseUrlOverride?.trimEnd('/')?.plus("/") ?: "http://${host.substringBefore(':')}/TMI/v1/"
+
     override val knownEndpoints = listOf(
         KnownEndpoint("Gateway status", "GET", Endpoints.GATEWAY_INFO, needsLogin = false),
         KnownEndpoint("Cell details", "GET", Endpoints.CELL),
@@ -88,6 +96,7 @@ class TmiGatewayClient(
         const val REBOOT = "gateway/reset?set=reboot"
         const val AUTH = "auth/login"
         const val RESET_LOGIN = "auth/admin/reset"
+        const val FIRMWARE = "gateway/upgrade"
     }
 
     override suspend fun exists(timeoutMs: Long): Boolean = try {
@@ -206,6 +215,57 @@ class TmiGatewayClient(
             }.build()
         }
         return RawResponse(r.code, Redact.text(r.body), r.tookMs, r.headers["Content-Type"])
+    }
+
+    override suspend fun uploadFirmware(file: FirmwareFile, onProgress: (Long) -> Unit): FirmwareUploadResult {
+        val creds = credentials ?: throw GatewayException.Unauthorized("Log in to the gateway first")
+        val client = http.newBuilder()
+            .retryOnConnectionFailure(false)
+            .followRedirects(false)
+            .writeTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(10, TimeUnit.MINUTES)
+            .callTimeout(30, TimeUnit.MINUTES)
+            .build()
+        // Same two steps as the gateway's web page: log in on port 80, then send the file there.
+        val loginBody = GatewayJson.write.encodeToString(UsernamePassword.serializer(), UsernamePassword(creds.first, creds.second))
+        val login = try {
+            client.await(
+                Request.Builder().url(webRoot + Endpoints.AUTH)
+                    .header("Accept", "application/json")
+                    .post(loginBody.toRequestBody(JSON))
+                    .build(),
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            throw GatewayException.Unreachable(host, e)
+        }
+        if (login.code == 401 || login.code == 403) throw GatewayException.Unauthorized()
+        if (!login.isSuccess) throw httpError(login)
+        val webToken = decode(login.body, LoginResultData.serializer(), "login").auth?.token
+        if (webToken.isNullOrBlank()) throw GatewayException.TooManyAttempts("The gateway didn't accept the login. Wait a few minutes and try again.")
+
+        val body = FirmwareBody(file, onProgress)
+        val request = Request.Builder().url(webRoot + Endpoints.FIRMWARE)
+            .header("Accept", "application/json")
+            .header("Authorization", "Bearer $webToken")
+            .header("Cache-Control", "no-cache")
+            .post(body)
+            .build()
+        val r = try {
+            client.await(request)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            if (file.size > 0 && body.sent >= file.size) return FirmwareUploadResult.SentNoAnswer
+            if (body.sent == 0L && e.isUnreachable()) throw GatewayException.Unreachable(host, e)
+            throw GatewayException.UploadInterrupted(body.sent, file.size, e)
+        }
+        return when {
+            r.isSuccess -> FirmwareUploadResult.Accepted
+            r.code == 401 || r.code == 403 -> throw GatewayException.Unauthorized("The gateway refused the upload (HTTP ${r.code}). Log in again.")
+            else -> throw httpError(r)
+        }
     }
 
     // --- internals ---

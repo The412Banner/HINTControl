@@ -26,6 +26,10 @@ sealed class GatewayException(message: String, cause: Throwable? = null) : Excep
 
     class NotSupported(feature: String) : GatewayException("$feature isn't available on this gateway")
 
+    /** The connection dropped before the whole firmware file was sent. */
+    class UploadInterrupted(val sent: Long, val total: Long, cause: Throwable? = null) :
+        GatewayException("The connection dropped after ${sent / 1_048_576} of ${total / 1_048_576} MB, so the gateway didn't get the whole file", cause)
+
     class NoGatewayFound(val tried: List<String>) :
         GatewayException("No T-Mobile gateway found at ${tried.joinToString()}")
 }

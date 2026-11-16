@@ -1,5 +1,7 @@
 package com.banner.hintcontrol.gateway.demo
 
+import com.banner.hintcontrol.gateway.FirmwareFile
+import com.banner.hintcontrol.gateway.FirmwareUploadResult
 import com.banner.hintcontrol.gateway.GatewayCapabilities
 import com.banner.hintcontrol.gateway.GatewayClient
 import com.banner.hintcontrol.gateway.GatewayException
@@ -41,6 +43,10 @@ import kotlin.random.Random
 interface DemoBootTimeStore {
     fun load(): Long?
     fun save(bootedAt: Long)
+
+    /** The demo's firmware version after a simulated firmware install. */
+    fun loadFirmware(): String? = null
+    fun saveFirmware(version: String) {}
 }
 
 /**
@@ -53,6 +59,7 @@ class DemoGatewayClient(
     private val latencyMs: Long = 120L,
     private val rebootDowntimeMs: Long = 25_000L,
     private val bootTime: DemoBootTimeStore? = null,
+    private val uploadChunkDelayMs: Long = 8L,
 ) : GatewayClient {
     override val kind = GatewayKind.Demo
     override val host = "demo"
@@ -74,6 +81,7 @@ class DemoGatewayClient(
     private var password = DEMO_PASSWORD
     private var bootedAt = bootTime?.load() ?: (clock() - 3L * 24 * 3600 * 1000 - 5 * 3600 * 1000).also { bootTime?.save(it) }
     private var offlineUntil = 0L
+    private var firmware = bootTime?.loadFirmware() ?: DEMO_FIRMWARE
 
     // Random-walk state for the radio values.
     private var nrRsrp = -92.0
@@ -166,7 +174,7 @@ class DemoGatewayClient(
         step()
         val now = clock()
         return MainData(
-            device = DeviceData(friendlyName = "5G Gateway", hardwareVersion = "R01", isEnabled = true, isMeshSupported = true, macId = "10:AC:67:81:18:86", manufacturer = "Demo", model = "G5AR", name = "5G Gateway", role = "gateway", serial = "DEMO00042", softwareVersion = "1.2403.0.12", type = "HSID", updateState = "latest"),
+            device = DeviceData(friendlyName = "5G Gateway", hardwareVersion = "R01", isEnabled = true, isMeshSupported = true, macId = "10:AC:67:81:18:86", manufacturer = "Demo", model = "G5AR", name = "5G Gateway", role = "gateway", serial = "DEMO00042", softwareVersion = firmware, type = "HSID", updateState = "latest"),
             signal = SignalData(fourG = lte(), fiveG = nr(), generic = GenericData(apn = "FBB.HOME", hasIPv6 = true, registration = "registered", roaming = false)),
             time = TimeData(daylightSavings = DaylightSavingsData(isUsed = true), localTime = now / 1000, localTimeZone = "EST5EDT", upTime = (now - bootedAt) / 1000),
         )
@@ -233,6 +241,29 @@ class DemoGatewayClient(
         return RebootResult.Accepted
     }
 
+    /** Simulated: reads the file, "installs" it and restarts with the next version number. */
+    override suspend fun uploadFirmware(file: FirmwareFile, onProgress: (Long) -> Unit): FirmwareUploadResult {
+        authed()
+        var sent = 0L
+        file.open().use { input ->
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                val n = input.read(buffer)
+                if (n < 0) break
+                sent += n
+                onProgress(sent)
+                delay(uploadChunkDelayMs)
+            }
+        }
+        if (sent != file.size) throw GatewayException.UploadInterrupted(sent, file.size)
+        firmware = nextVersion(firmware)
+        bootTime?.saveFirmware(firmware)
+        offlineUntil = clock() + rebootDowntimeMs
+        bootedAt = offlineUntil
+        bootTime?.save(bootedAt)
+        return FirmwareUploadResult.Accepted
+    }
+
     override suspend fun rawRequest(method: String, path: String, body: String?): RawResponse {
         online()
         val text = when {
@@ -247,5 +278,12 @@ class DemoGatewayClient(
 
     companion object {
         const val DEMO_PASSWORD = "demo"
+        const val DEMO_FIRMWARE = "1.2403.0.12"
+
+        /** "1.2403.0.12" → "1.2403.0.13". */
+        fun nextVersion(version: String): String {
+            val last = version.substringAfterLast('.').toIntOrNull() ?: return "$version.1"
+            return version.substringBeforeLast('.') + "." + (last + 1)
+        }
     }
 }

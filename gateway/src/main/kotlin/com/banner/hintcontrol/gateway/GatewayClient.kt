@@ -80,6 +80,13 @@ interface GatewayClient {
 
     /** Sends a request as-is (API explorer). [path] is relative to the API root. */
     suspend fun rawRequest(method: String, path: String, body: String?): RawResponse
+
+    /**
+     * Sends a firmware file the way the gateway's own web page does; the gateway decides whether to
+     * install it. Never retried automatically. [onProgress] gets the bytes handed to the network so far.
+     */
+    suspend fun uploadFirmware(file: FirmwareFile, onProgress: (Long) -> Unit): FirmwareUploadResult =
+        throw GatewayException.NotSupported("Firmware upload")
 }
 
 object GatewayAddress {
