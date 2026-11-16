@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -157,7 +159,7 @@ fun FirmwareBody(ui: FirmwareUi, onChoose: () -> Unit, onInstall: () -> Unit, on
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionCard("Gateway", Icons.Outlined.Router) {
             InfoRow("Model", ui.model)
-            InfoRow("Firmware now", ui.job?.before ?: ui.firmware)
+            InfoRow("Firmware now", ui.job?.after ?: ui.job?.before ?: ui.firmware)
         }
         val job = ui.job
         if (job == null) {
@@ -195,7 +197,15 @@ private fun PickCard(ui: FirmwareUi, onChoose: () -> Unit, onInstall: () -> Unit
                 var confirm by rememberSaveable(picked.sha256) { mutableStateOf("") }
                 InfoRow("File", picked.name)
                 InfoRow("Size", "${FirmwareUploader.mb(picked.size)} MB")
-                InfoRow("SHA-256", picked.sha256, mono = true, copyable = true)
+                Text("SHA-256", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
+                SelectionContainer {
+                    Text(
+                        shaGroups(picked.sha256),
+                        fontFamily = FontFamily.Monospace,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
                 Text(
                     "Compare the SHA-256 with your source before sending.",
                     style = MaterialTheme.typography.bodySmall,
@@ -278,6 +288,9 @@ private fun JobCard(job: FirmwareJob, onDone: () -> Unit) {
         }
     }
 }
+
+/** The full SHA-256 in groups of 16, so it can be compared by eye. */
+internal fun shaGroups(sha: String): String = sha.chunked(16).joinToString(" ")
 
 private fun answerText(answer: FirmwareUploadResult?): String = when (answer) {
     FirmwareUploadResult.Accepted -> "The gateway accepted the file."
