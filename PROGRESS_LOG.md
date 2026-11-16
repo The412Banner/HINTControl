@@ -6,7 +6,8 @@ Newest entry first. Times are US Eastern.
 - Branch `feat/android-compose` (main = upstream zacharee/HINTControl 1.17.3, untouched; merge = user's go after device test).
 - Release candidate: **25b021a34c444afd6596f4886144998fdf5ea3d1**, CI run **43814242612** green (gateway 36 tests, LogicTest 7, ContainerTest end-to-end, R8 release APK, apksigner v1+v2+v3 true, cert a40da80a…f5dc, 18 screenshots).
 - APK `HINTControl-v1.0.0-pre1-25b021a3.apk`, 3,329,576 bytes, sha256 `764fed21464e19150ccd85709fa7440deda8883f8a730e2556202a52825557b3`. Staged on the Pocket FIT: `/sdcard/Download/HINTControl-android-compose-25b021a3.apk` (hash host == device). NOT installed (needs the user's yes). Upstream app dev.zwander.arcadyankvd21control is installed on the FIT; ours is a separate package.
-- Next: publish v1.0.0-pre1 PRE-RELEASE with this exact APK (`gh release create --target 25b021a3… --prerelease`), verify, then user test. Stable/Latest only on the user's word.
+- **v1.0.0-pre1 PUBLISHED as pre-release** (https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0-pre1): tag → 25b021a34c444afd6596f4886144998fdf5ea3d1, pre-release, not Latest (no stable exists), assets = the staged APK + .sha256 (re-downloaded, sha256 764fed21… matches), notes == release-notes/v1.0.0-pre1.md.
+- Next: user installs/tests (or says yes to my installing on the FIT). Merge to main (backup ref first) and stable 1.0.0 only on the user's word. Untested: everything on real gateway hardware; on-device: widget, tile, scheduled reboot alarm, updater install flow, notifications.
 
 ## Lessons learned (don't repeat these)
 - Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
