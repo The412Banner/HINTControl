@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.RestartAlt
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Settings
@@ -66,6 +67,7 @@ import com.banner.hintcontrol.ui.nav.AlertsRoute
 import com.banner.hintcontrol.ui.nav.AutomationRoute
 import com.banner.hintcontrol.ui.nav.EventsRoute
 import com.banner.hintcontrol.ui.nav.ExplorerRoute
+import com.banner.hintcontrol.ui.nav.SpeedTestRoute
 import com.banner.hintcontrol.ui.nav.GatewayInfoRoute
 import com.banner.hintcontrol.ui.nav.LocalAppActions
 import com.banner.hintcontrol.ui.nav.ProfilesRoute
@@ -116,6 +118,7 @@ fun MoreContent(ui: MoreUi) {
             Column(Modifier.widthIn(max = 760.dp).fillMaxWidth()) {
                 SectionHeader(ui.gatewayName)
                 SettingRow("Gateway details", subtitle = "Model, firmware, SIM, report", icon = Icons.Outlined.Router, onClick = { actions.navigate(GatewayInfoRoute) })
+                SettingRow("Speed test", subtitle = "Download, upload and ping", icon = Icons.Outlined.Speed, onClick = { actions.navigate(SpeedTestRoute) })
                 SettingRow("Reboot now", icon = Icons.Outlined.RestartAlt, onClick = actions.askReboot)
                 SettingRow("Scheduled reboot", subtitle = ui.scheduleSummary, icon = Icons.Outlined.Schedule, onClick = { actions.navigate(ScheduleRoute) })
                 if (ui.canChangeLogin) SettingRow("Admin login", subtitle = "Change the gateway's username and password", icon = Icons.Outlined.Key, onClick = { actions.navigate(AdminLoginRoute) })

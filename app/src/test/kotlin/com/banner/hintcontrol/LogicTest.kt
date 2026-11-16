@@ -9,6 +9,7 @@ import com.banner.hintcontrol.gateway.model.WifiConfig
 import com.banner.hintcontrol.ui.components.ChartPoint
 import com.banner.hintcontrol.ui.components.nearestTime
 import com.banner.hintcontrol.ui.components.wifiQrText
+import com.banner.hintcontrol.ui.speed.signalText
 import com.banner.hintcontrol.ui.wifi.WifiChanges
 import com.banner.hintcontrol.ui.wifi.WifiDraft
 import com.banner.hintcontrol.update.AppVersion
@@ -26,6 +27,15 @@ import java.time.ZonedDateTime
 
 class LogicTest {
     private fun v(s: String) = AppVersion.parse(s)!!
+
+    @Test
+    fun `speed numbers and signal text`() {
+        assertEquals("3.4", com.banner.hintcontrol.ui.speed.mbpsText(3.39))
+        assertEquals("412", com.banner.hintcontrol.ui.speed.mbpsText(412.6))
+        val r = com.banner.hintcontrol.data.SpeedRecord(time = 0, nrBand = "n41", nrRsrp = -95, nrSinr = 10)
+        assertEquals("5G n41 RSRP -95 SINR 10", r.signalText())
+        assertNull(com.banner.hintcontrol.data.SpeedRecord(time = 0).signalText())
+    }
 
     @Test
     fun `band changes become chart markers`() {

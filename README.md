@@ -47,6 +47,7 @@ Compared with HINT Control:
 - **Device names**: give devices your own names, see when they first appeared, and spot new devices and private (randomised) MAC addresses
 - **Review before saving**: every Wi-Fi change is listed for you to check before it's sent, on top of HINT Control's warnings
 - **Share Wi-Fi as a QR code**
+- **Speed test**: download, upload, ping and jitter (using Cloudflare's speed test servers), saved with your gateway's signal at the time so you can compare spots and bands; plus a shortcut to Speedtest by Ookla
 - **Scheduled reboots** on chosen days and times
 - **Alerts**: notifications when the gateway goes offline (only while you're on its network), restarts, has a weak signal or a new device joins, plus an event log
 - **Quick Settings tile and app shortcuts**
@@ -75,7 +76,8 @@ Compared with HINT Control:
 
 | Permission | Why |
 | --- | --- |
-| Internet, network state, local network | Talk to the gateway; check for app updates on GitHub |
+| Internet, network state, local network | Talk to the gateway; check for app updates on GitHub; run speed tests |
+| Wi-Fi state | Show the phone's Wi-Fi link speed next to speed test results |
 | Notifications | Alerts and update notices (you're asked once) |
 | Exact alarms, start at boot, foreground service | Scheduled reboots at the time you set, also after the phone restarts |
 | Install apps | Install updates you choose to download (Android asks you to allow this the first time) |

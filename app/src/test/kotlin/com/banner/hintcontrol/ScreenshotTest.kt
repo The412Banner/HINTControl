@@ -247,6 +247,39 @@ class ScreenshotTest {
         SetupContent(SetupUi(step = SetupStep.NotFound("No T-Mobile gateway answered at 192.168.12.1, 192.168.1.1.")), null, {}, {}, { _, _, _, _ -> }, {})
     }
 
+    private val speedHistory = listOf(
+        com.banner.hintcontrol.data.SpeedRecord(
+            time = System.currentTimeMillis() - 60_000, profileId = "p", gatewayName = "Living room gateway",
+            downloadMbps = 412.6, uploadMbps = 38.4, pingMs = 31.0, jitterMs = 4.2, server = "EWR",
+            bytesDown = 260_000_000, bytesUp = 38_000_000, network = "Wi-Fi", wifiLinkMbps = 1200,
+            nrBand = "n41", nrRsrp = -92, nrSinr = 14,
+        ),
+        com.banner.hintcontrol.data.SpeedRecord(
+            time = System.currentTimeMillis() - 86_400_000, profileId = "p", downloadMbps = 96.0, uploadMbps = 7.5, pingMs = 48.0,
+            nrBand = "n71", nrRsrp = -104, nrSinr = 3,
+        ),
+    )
+
+    @Test
+    fun speedTest() = shot("19-speed-test") {
+        com.banner.hintcontrol.ui.speed.SpeedTestContent(
+            com.banner.hintcontrol.ui.speed.SpeedUi(history = speedHistory),
+            onBack = {}, onStart = {}, onStop = {}, onRunOnMobile = {}, onDismissMobile = {}, onClear = {}, onOokla = {},
+        )
+    }
+
+    @Test
+    fun speedTestRunning() = shot("20-speed-test-running", dark = true) {
+        com.banner.hintcontrol.ui.speed.SpeedTestContent(
+            com.banner.hintcontrol.ui.speed.SpeedUi(
+                running = true,
+                progress = com.banner.hintcontrol.gateway.speed.SpeedProgress(com.banner.hintcontrol.gateway.speed.SpeedPhase.Download, 287.4, 31.0, 0.45f),
+                history = speedHistory,
+            ),
+            onBack = {}, onStart = {}, onStop = {}, onRunOnMobile = {}, onDismissMobile = {}, onClear = {}, onOokla = {},
+        )
+    }
+
     @Test
     fun shellPortrait() = shot("17-shell-portrait") {
         AppNavigationSuite(isSelected = { it == TopDestination.Overview }, updateBadge = true, onSelect = {}) {

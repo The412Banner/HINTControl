@@ -1,5 +1,9 @@
 package com.banner.hintcontrol.ui.overview
 
+import com.banner.hintcontrol.ui.speed.mbpsText
+import com.banner.hintcontrol.ui.nav.SpeedTestRoute
+import com.banner.hintcontrol.data.SpeedRecord
+import androidx.compose.material.icons.outlined.Speed
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -112,6 +116,8 @@ data class OverviewUi(
     val trendNr: List<Float> = emptyList(),
     val trendLte: List<Float> = emptyList(),
     val towerNames: Map<String, String> = emptyMap(),
+    /** Latest speed test on this gateway. */
+    val lastSpeed: SpeedRecord? = null,
 )
 
 class OverviewViewModel(private val c: AppContainer) : ViewModel() {
@@ -121,9 +127,9 @@ class OverviewViewModel(private val c: AppContainer) : ViewModel() {
         if (p == null) flowOf(emptyList()) else c.history.samples(p.id, System.currentTimeMillis() - 30 * 60_000L)
     }
 
-    private val trendAndNames = combine(trend, c.settings.settings) { samples, s -> samples to s.towerNames }
+    private val trendAndNames = combine(trend, c.settings.settings, c.speedTests.records) { samples, s, speeds -> Triple(samples, s.towerNames, speeds) }
 
-    val ui: StateFlow<OverviewUi> = combine(c.status.state, c.profiles.state, c.session.access, counts, trendAndNames) { live, profiles, access, counts, (samples, names) ->
+    val ui: StateFlow<OverviewUi> = combine(c.status.state, c.profiles.state, c.session.access, counts, trendAndNames) { live, profiles, access, counts, (samples, names, speeds) ->
         OverviewUi(
             profile = profiles.active,
             profiles = profiles.profiles,
@@ -133,6 +139,7 @@ class OverviewViewModel(private val c: AppContainer) : ViewModel() {
             trendNr = samples.mapNotNull { it.nrSinr?.toFloat() },
             trendLte = samples.mapNotNull { it.lteSinr?.toFloat() },
             towerNames = names,
+            lastSpeed = speeds.firstOrNull { it.profileId == profiles.active?.id },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), OverviewUi())
 
@@ -191,6 +198,7 @@ fun OverviewScreen() {
         onDevices = { actions.navigate(DevicesRoute) },
         onSignal = { actions.navigate(SignalRoute) },
         onGateway = { actions.navigate(GatewayInfoRoute) },
+        onSpeedTest = { actions.navigate(SpeedTestRoute) },
     )
 }
 
@@ -205,6 +213,7 @@ fun OverviewContent(
     onDevices: () -> Unit,
     onSignal: () -> Unit,
     onGateway: () -> Unit,
+    onSpeedTest: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -231,7 +240,7 @@ fun OverviewContent(
             when {
                 main == null && ui.live.error != null -> ErrorBox(ui.live.error.userMessage(), offline = ui.live.offline, onRetry = onRefresh)
                 main == null -> LoadingBox(text = "Reading the gateway…")
-                else -> OverviewGrid(ui, main, onReboot, onDevices, onSignal, onGateway, onRefresh)
+                else -> OverviewGrid(ui, main, onReboot, onDevices, onSignal, onGateway, onRefresh, onSpeedTest)
             }
         }
     }
@@ -271,6 +280,7 @@ private fun OverviewGrid(
     onSignal: () -> Unit,
     onGateway: () -> Unit,
     onRefresh: () -> Unit,
+    onSpeedTest: () -> Unit,
 ) {
     val nr = main.signal?.fiveG?.takeIf { it.rsrp != null || !it.bands.isNullOrEmpty() }
     val lte = main.signal?.fourG?.takeIf { it.rsrp != null || !it.bands.isNullOrEmpty() }
@@ -298,6 +308,7 @@ private fun OverviewGrid(
         }
         if (ui.trendNr.size > 2 || ui.trendLte.size > 2) item { TrendCard(ui.trendNr, ui.trendLte, onSignal) }
         item { DevicesCard(ui.clientCounts, ui.access, onDevices) }
+        item { SpeedCard(ui.lastSpeed, onSpeedTest) }
         item { NetworkCard(main) }
         item { GatewayCard(main, onGateway, onReboot) }
     }
@@ -443,6 +454,26 @@ private fun GatewayCard(main: MainData, onDetails: () -> Unit, onReboot: () -> U
                 Spacer(Modifier.width(6.dp))
                 Text("Reboot")
             }
+        }
+    }
+}
+
+@Composable
+private fun SpeedCard(last: SpeedRecord?, onOpen: () -> Unit) {
+    SectionCard(
+        "Speed test",
+        Icons.Outlined.Speed,
+        onClick = onOpen,
+        trailing = { Icon(Icons.AutoMirrored.Outlined.ArrowForward, "Open speed test") },
+    ) {
+        if (last == null) {
+            Text("Measure download, upload and ping through this gateway.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            Text(
+                "↓ ${last.downloadMbps?.let(::mbpsText) ?: "—"}  ↑ ${last.uploadMbps?.let(::mbpsText) ?: "—"} Mbps" + (last.pingMs?.let { " · ${it.toInt()} ms" } ?: ""),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(Format.ago(last.time), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

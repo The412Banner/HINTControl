@@ -53,6 +53,7 @@ import com.banner.hintcontrol.ui.reboot.RebootConfirmDialog
 import com.banner.hintcontrol.ui.reboot.RebootProgressDialog
 import com.banner.hintcontrol.ui.setup.SetupScreen
 import com.banner.hintcontrol.ui.signal.SignalScreen
+import com.banner.hintcontrol.ui.speed.SpeedTestScreen
 import com.banner.hintcontrol.ui.wifi.WifiScreen
 import com.banner.hintcontrol.update.UpdateState
 
@@ -113,6 +114,7 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
             "reboot" -> confirmReboot = true
             "updates" -> nav.navigate(UpdatesRoute)
             "events" -> nav.navigate(EventsRoute)
+            "speedtest" -> nav.navigate(SpeedTestRoute)
         }
         onLinkHandled()
     }
@@ -152,6 +154,7 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
                 composable<AboutRoute> { AboutScreen() }
                 composable<AdminLoginRoute> { AdminLoginScreen() }
                 composable<AutomationRoute> { AutomationScreen() }
+                composable<SpeedTestRoute> { SpeedTestScreen() }
             }
         }
     }

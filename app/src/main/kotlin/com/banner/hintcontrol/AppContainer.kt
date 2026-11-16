@@ -40,6 +40,7 @@ class AppContainer(
     val status = StatusRepository(scope, session, settings, history, summaries, onSummary = ::refreshSurfaces)
     val reboots = RebootController(scope, session, history)
     val updates = UpdateRepository(context, settings)
+    val speedTests = SpeedTestStore(context)
 
     /** Asks the home-screen widget and the Quick Settings tile to redraw from the saved summary. */
     fun refreshSurfaces() {

@@ -40,6 +40,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object AboutRoute
 @Serializable data object AdminLoginRoute
 @Serializable data object AutomationRoute
+@Serializable data object SpeedTestRoute
 
 enum class TopDestination(
     val label: String,

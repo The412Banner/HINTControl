@@ -8,4 +8,6 @@
     <string name="shortcut_reboot">Reboot gateway</string>
     <string name="shortcut_reboot_long">Reboot the gateway</string>
     <string name="shortcut_devices">Devices</string>
+    <string name="shortcut_speed">Speed test</string>
+    <string name="shortcut_speed_long">Run a speed test</string>
 </resources>
