@@ -14,6 +14,13 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~06:50 EST — Stable v1.0.0 + README rewrite + merge to main (in progress)
+**Why:** user: "updated to pre5, devices show now, can you release a stable release and rewrite the repo read me accurately, professionally and make sure to credit the original upstream work. also list what this app added and what makes it different simply" + "make sure everything is on the main branch also".
+**Verified first:** FIT pre5 installed (hash 25bf4132… == release); app DB has 10 devices for the real G5AR profile (fix device-proven), no crash.
+**README (0095868):** HINT Control / Zachary Wander credit up front; gateway table with real-hardware column (TMO-G5AR ✓); "What Hint Plus adds" and "What's different" checked against HINT Control 1.17.3 source (upstream already has: widget, snapshot history charts, in-app updater with signing-cert check, Tasker plugin → not listed as new); fixes incl. #123 credit (cmarker84, fitzmorrispr); permissions; automation; building; screenshots (demo data, docs/screenshots).
+**Release commit:** 063d94715e3c1c196f4fcebe038e76e95b0c2e65 (versionCode 6, 1.0.0, release-notes/v1.0.0.md), CI 43862124937.
+**Plan:** green → verify APK → backup ref refs/backup/20261116/main-before-android-compose (= f5b14a5) → fast-forward main → `gh release create v1.0.0 --target 063d9471… --latest` → verify (Latest, tag, assets, notes) → main == feat (only PROGRESS_LOG may differ from the tag).
+
 ## 2026-11-16 ~06:00–06:35 EST — First real gateway (feat/android-compose, pre5 published with G5AR device-list fix)
 **Why:** user: "updated to pre4, shows Hint Plus, I am on my T-Mobile gateway now also".
 **pre4 on the FIT (user-updated via the app):** versionCode 4 / 1.0.0-pre4, lastUpdateTime 05:59:20, installed base.apk sha256 57b8724c… == release; launcher shows "Hint Plus" (user).
