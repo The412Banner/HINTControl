@@ -21,6 +21,11 @@ data class ClientsData(
     val sixGig: List<WirelessClientData>? = null,
     val ethernet: List<WiredClientData>? = null,
     val wireless: List<WirelessClientData>? = null,
+    /**
+     * G5AR / G5SE firmware lists every Wi-Fi client here instead of per band. Found by cmarker84
+     * and fitzmorrispr in HINT Control issue #123; the old app showed only wired clients there.
+     */
+    val wifi: List<WirelessClientData>? = null,
 )
 
 interface BaseClientData {
@@ -85,5 +90,6 @@ fun ClientDeviceData.flatten(): List<Client> {
         c.twoGig.map(ClientLink.TwoGig) +
         c.fiveGig.map(ClientLink.FiveGig) +
         c.sixGig.map(ClientLink.SixGig) +
-        c.wireless.map(ClientLink.Wireless)
+        c.wireless.map(ClientLink.Wireless) +
+        c.wifi.map(ClientLink.Wireless)
 }

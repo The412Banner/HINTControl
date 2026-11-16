@@ -1,5 +1,7 @@
 package com.banner.hintcontrol.gateway
 
+import com.banner.hintcontrol.gateway.model.ClientLink
+import com.banner.hintcontrol.gateway.model.ClientDeviceData
 import com.banner.hintcontrol.gateway.model.BandConfig
 import com.banner.hintcontrol.gateway.model.WifiBand
 import com.banner.hintcontrol.gateway.model.flatten
@@ -179,6 +181,18 @@ class TmiGatewayClientTest {
         assertEquals(listOf("fe80::7a45:58ff:fee6:72c6"), wired.ipv6)
         assertTrue(wired.isPrivateMac)
         assertEquals(-61, list.first { it.name == "Thermostat" }.signal)
+    }
+
+    @Test
+    fun `G5AR lists Wi-Fi clients under wifi`() {
+        // Shape reported for G5AR/G5SE firmware in HINT Control issue #123 (made-up values).
+        val json = """{"clients":{"2.4ghz":[],"5.0ghz":[],"ethernet":[{"connected":true,"ipv4":"192.168.12.20","ipv6":[],"mac":"00:11:22:33:44:55","name":"Desktop"}],
+            "wifi":[{"connected":true,"ipv4":"192.168.12.150","ipv6":[],"mac":"DA:11:22:33:44:66","name":"Phone","signal":-48},
+                    {"connected":true,"ipv4":"192.168.12.151","ipv6":[],"mac":"10:11:22:33:44:77","name":"TV","signal":-60}]}}"""
+        val list = GatewayJson.read.decodeFromString(ClientDeviceData.serializer(), json).flatten()
+        assertEquals(3, list.size)
+        assertEquals(2, list.count { it.link == ClientLink.Wireless })
+        assertEquals(-48, list.first { it.name == "Phone" }.signal)
     }
 
     @Test
