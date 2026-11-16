@@ -42,8 +42,8 @@ Compared with HINT Control:
 
 - **Signal score and ratings**: a 0–100 score, Excellent-to-Poor ratings for RSRP, SINR, RSRQ and RSSI, and bands shown with their frequency (for example `n41 · 2.5 GHz`)
 - **Placement mode**: one reading per second, with a tone and vibration that rise as the signal improves, and the best spot remembered
-- **More from signal history**: band-change tracking and CSV export
-- **Cell details**: the eNB and sector worked out from the LTE cell ID when the gateway doesn't report them
+- **More from signal history**: band changes marked on the chart and listed, an optional fixed chart scale, and CSV export
+- **Cell details**: the eNB and sector worked out from the LTE cell ID when the gateway doesn't report them, and your own names for cell towers
 - **Device names**: give devices your own names, see when they first appeared, and spot new devices and private (randomised) MAC addresses
 - **Review before saving**: every Wi-Fi change is listed for you to check before it's sent, on top of HINT Control's warnings
 - **Share Wi-Fi as a QR code**
@@ -68,6 +68,8 @@ Compared with HINT Control:
 - Nokia 5G21: the SIM always showed as inactive, and login used saved credentials instead of the ones you typed.
 - The gateway's reported location was never read.
 - The gateway password was stored unencrypted.
+- Gateways that answer slowly showed as "not found" ([#122](https://github.com/zacharee/HINTControl/issues/122)); Hint Plus now waits longer before giving up.
+- "Can't reach the gateway" now says when a VPN is on ([#84](https://github.com/zacharee/HINTControl/issues/84)), and a refused correct password explains the gateway restart fix ([#2](https://github.com/zacharee/HINTControl/issues/2), [#129](https://github.com/zacharee/HINTControl/issues/129)).
 
 ## Permissions
 

@@ -3,21 +3,22 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- **Stable v1.0.0 (Latest)** published 2026-11-16 07:02 EST, tag → 063d94715e3c1c196f4fcebe038e76e95b0c2e65; main = feat/android-compose (fast-forwarded from upstream 1.17.3; backup refs/backup/20261116/main-before-android-compose).
-- App name **Hint Plus**, app ID com.banner.hintcontrol. Tested on a real Arcadyan TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices. Pocket FIT runs 1.0.0-pre5.
-- Open: Wi-Fi settings + reboot on the real G5AR (ask first, cuts internet), update notification seen naturally, widget and Quick Settings tile on a device, other gateway models.
+- **Stable v1.0.1 (Latest)** published 2026-11-16 07:47 EST, tag → 58207440d8b943121206de13bd4d9dc12d87ee1e; main = feat/upstream-fixes-1.0.1 (backups refs/backup/20261116/main-before-android-compose, …/main-before-1.0.1).
+- App name **Hint Plus**, app ID com.banner.hintcontrol. Real Arcadyan TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices proven. Pocket FIT runs 1.0.0-pre5.
+- Open: HINT Control issues needing the real G5AR (#133 band steering, #120 G5AR Wi-Fi settings, #82 parental controls), Wi-Fi save + reboot on the G5AR (ask first), update notification seen naturally, widget + tile on a device, demo false "RebootDetected" after app updates.
 
 ## Lessons learned (don't repeat these)
 - Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
-## 2026-11-16 ~07:20 EST — 1.0.1: fixes from HINT Control issues (feat/upstream-fixes-1.0.1, in progress)
+## 2026-11-16 ~07:20–07:50 EST — 1.0.1: fixes from HINT Control issues (main, released)
 **Why:** user: "do 1-6 as 1.0.1, release it when green" (from the review of the 34 open HINT Control issues).
 **Plan:** (1) #122 slow gateway: retry detection with a longer timeout; (2) #84 VPN: say when a VPN may block the gateway; (3) #2/#129/#134 correct password refused: explain the gateway restart fix; (4) #102 band-change markers on the history chart; (5) #127 optional fixed chart scale; (6) #24 tower nicknames. Then version 1.0.1 (vc 7) → CI green → backup ref → main fast-forward → stable release v1.0.1.
 **Built 3d55a7ef:** (1) GatewayClient.exists(timeoutMs) + GatewayDiscovery.detect(timeoutMs); setup retries with SLOW_PROBE_TIMEOUT_MS = 20 s and shows "Still looking…"; (2) NetworkInfo.vpnActive() (TRANSPORT_VPN, init in HintApp) → note in Unreachable/NoGatewayFound messages; (3) Unauthorized.passwordRejected → "restart the gateway" hint, also for TooManyAttempts; (4) ChartMarker band-change lines on the history chart (BandChange data class); (5) "Fixed scale" chip → AppSettings.fixedChartScale, Metric.chartRange (RSRP -130..-50, SINR -10..35, RSRQ -25..0, RSSI -110..-30); (6) AppSettings.towerNames keyed towerKey(nr, nodeId) = "nr:<gNB>"/"lte:<eNB>", edit on Cell tab (dialog), shown on Cell tab + Home. Tests: gateway 38/38 locally (new: slow gateway found with longer timeout), LogicTest band markers + tower key. CI 43867414364.
 **CI 43867414364 green** (screenshot 05-signal-history shows the band-change markers "n71"/"n41" and the Fixed scale chip). Release commit 58207440d8b943121206de13bd4d9dc12d87ee1e (vc 7, 1.0.1, release-notes/v1.0.1.md), CI 43868658622.
-**Resume point:** green → verify APK → backup ref refs/backup/20261116/main-before-1.0.1 → FF main → `gh release create v1.0.1 --target 58207440… --latest` → verify.
+**Done 07:47 EST:** CI 43868658622 green (HintPlus-v1.0.1-58207440.apk, vc 7, 1.0.1, label Hint Plus, v1/v2/v3, cert a40da80a, sha256 e98160f5531efebe367ad18851e138fd78b8d7970e426b703c2214d01f25d204). Backup ref refs/backup/20261116/main-before-1.0.1 = 1940215; main FF → f2704eb (differs from the release commit only in PROGRESS_LOG.md). **Stable v1.0.1 = Latest**: https://github.com/The412Banner/HINTControl/releases/tag/v1.0.1 — tag → 58207440d8b943121206de13bd4d9dc12d87ee1e (on main), assets APK + .sha256, re-download matches, notes == file (+ final newline). README updated with the 1.0.1 features afterwards (docs only).
+**Proof level:** CI-green; not device-tested (FIT runs pre5; the app will offer 1.0.1).
 
 ## 2026-11-16 ~06:50–07:05 EST — Stable v1.0.0 + README rewrite + merge to main (main, released)
 **Why:** user: "updated to pre5, devices show now, can you release a stable release and rewrite the repo read me accurately, professionally and make sure to credit the original upstream work. also list what this app added and what makes it different simply" + "make sure everything is on the main branch also".
