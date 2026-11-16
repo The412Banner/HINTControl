@@ -18,7 +18,10 @@ Newest entry first. Times are US Eastern.
 **Why:** user: "yes put the widget fix in pre3" (widget said "Gateway offline" when the phone is simply away from the gateway's network). Plus the bugs found in the pre1 → pre2 update test.
 **Built:** 7b244742 — StatusSummary.away (markOffline(name, host) checks NetworkInfo.onGatewayNetwork; demo excluded), widget "Not on gateway network", tile "Not on its network"; Updates re-checks install permission on resume (LifecycleResumeEffect); MarkdownLite renders > quotes; clearDownloads() at app start; bottom bar keeps the last tab selected on sub-screens; More badge/row also for ReadyToInstall. ContainerTest asserts away true/false. CI 43846422004 running.
 **Plan:** green → release commit (vc 3, 1.0.0-pre3, release-notes/v1.0.0-pre3.md) → CI → publish prerelease → update FIT pre2 → pre3 through the app (ask/check screen first; user is active on the device).
-**Resume point:** FIT runs pre2 (93b6e138, installed via the app). CI 43846422004 for 7b244742.
+**CI:** 43846422004 (7b244742) green incl. ContainerTest away assertions; release commit 698df3f56adadee9576335ef335eeae5c91fcd1c (vc 3, 1.0.0-pre3), CI 43847207507 green.
+**Published ~05:23 EST:** https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0-pre3 — tag → 698df3f5 (full SHA), prerelease (no Latest: API 404), APK HINTControl-v1.0.0-pre3-698df3f5.apk sha256 6177219fe27a244e3589788699baa4f867ed8a9a7366760af28267240acf2801 (vc 3, v1/v2/v3, cert a40da80a) + .sha256; re-downloaded hash matches; notes == file (+ trailing newline).
+**Next:** force-run the UpdateWorker (WorkManager job 4: `cmd jobscheduler run -f -n androidx.work.systemjobscheduler com.banner.hintcontrol 4`) → expect "Update available" notification → tap → install pre3.
+**Resume point:** FIT runs pre2 (installed via the app); pre3 published.
 
 ## 2026-11-16 ~05:00–05:07 EST — v1.0.0-pre2 release + in-app update test (feat/android-compose, pre2 published + device-proven update)
 **Why:** user picked option A: "publish pre2 and update through the app".
