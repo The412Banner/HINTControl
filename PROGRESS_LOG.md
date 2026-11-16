@@ -27,7 +27,8 @@ Newest entry first. Times are US Eastern.
 **Proof level:** gateway part tested locally; real G5AR upload NOT testable (no firmware file; no dummy-file test).
 **CI 43908776433 (6af865c): CANCELLED** — compiled fine, then `:app:testDebugUnitTest` hung 16:36 → 17:34 UTC until the 60-min job limit (no test output). Likely cause (not proven): the new second ContainerTest built another AppContainer in the same process, sharing the process-wide preferences DataStore (top-level delegate). **Fix e533dd1:** firmware check moved into demoGatewayEndToEnd (one container); unit-test task timeout 25 min + log "started"/"failed" per test. CI 43920187711 FAILED in 13 s: app/build.gradle.kts `java.time.Duration` unresolved (Kotlin DSL `java` = Java extension) → import java.time.Duration; checked locally with `:app:help --offline`.
 **User ~12:00:** "yes install it on the FIT when green" → stage in /sdcard/Download with hash check host + device, save log first, then install, logcat check.
-**Resume point:** CI 43920187711 → green → check screenshots 23-25 → stage + install on the FIT (user said yes) → demo-mode check.
+**CI 43920578149 (349ff1ba) GREEN** — gateway tests, app tests 1 m 21 s (ContainerTest demoGatewayEndToEnd incl. demo firmware upload), screenshots 23-25 OK. Hang cause confirmed in practice: same test content in one container ran fine. Screenshot review → 2 fixes c482ab7: full SHA-256 in groups of 16 (was cut off with "…"), "Firmware now" shows the new version when done. CI 43921791553 running.
+**Resume point:** CI 43921791553 → green → stage HintPlus APK in /sdcard/Download (hash host + device) → install on the FIT (user: "yes install it on the FIT when green") → logcat check → demo-mode walkthrough.
 
 ## 2026-11-16 10:44 EST — v1.1.2 released (main, stable/Latest)
 **Why:** user: "add all three to 1.1.2 and release when green" + "yes add the Auto Blocker tip to both".
