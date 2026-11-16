@@ -198,6 +198,18 @@ class ScreenshotTest {
     }
 
     @Test
+    fun wifiRadioOnly() = shot("21-wifi-radio-only") {
+        // G5AR-style settings: each radio reports only on/off (HINT Control #120), no band steering.
+        val radioOnly = data.wifi.copy(
+            twoGig = com.banner.hintcontrol.gateway.model.BandConfig(isRadioEnabled = true),
+            fiveGig = com.banner.hintcontrol.gateway.model.BandConfig(isRadioEnabled = true),
+            sixGig = null,
+            bandSteering = null,
+        )
+        WifiContent(WifiUi(original = radioOnly, draft = WifiDraft.of(radioOnly), loading = false, kind = GatewayKind.Tmi), WifiActions.None)
+    }
+
+    @Test
     fun more() = shot("10-more") {
         MoreContent(MoreUi(gatewayName = profile.name, scheduleSummary = "Every day at 04:00", canChangeLogin = true, developerMode = true, updateAvailable = "v1.0.0", profileCount = 2))
     }

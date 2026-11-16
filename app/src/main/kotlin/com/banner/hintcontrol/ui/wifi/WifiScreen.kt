@@ -343,26 +343,33 @@ private fun NetworkCard(
 @Composable
 private fun RadioCard(band: WifiBand, config: BandConfig, actions: WifiActions) {
     SectionCard(band.label, null, trailing = { Switch(config.isRadioEnabled == true, { actions.setRadio(band, it) }) }) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Dropdown(
+        // Only show what the gateway reports: the G5AR, for one, has just the on/off switch
+        // (HINT Control #120), and offering "Auto" pickers there would change nothing.
+        val channel = config.channel
+        val width = config.channelBandwidth
+        if (channel == null && width == null && config.transmissionPower == null) {
+            Text("This gateway only lets you turn this radio on or off.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (channel != null || width != null) Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (channel != null) Dropdown(
                 label = "Channel",
-                options = listOf(WifiBand.AUTO) + band.channels,
-                selected = config.channel ?: WifiBand.AUTO,
+                options = (listOf(WifiBand.AUTO) + band.channels + channel).distinct(),
+                selected = channel,
                 onSelect = { actions.setChannel(band, it) },
                 modifier = Modifier.weight(1f),
                 enabled = config.isRadioEnabled == true,
             )
-            Dropdown(
+            if (width != null) Dropdown(
                 label = "Width",
-                options = listOf(WifiBand.AUTO) + band.bandwidths,
-                selected = config.channelBandwidth ?: WifiBand.AUTO,
+                options = (listOf(WifiBand.AUTO) + band.bandwidths + width).distinct(),
+                selected = width,
                 onSelect = { actions.setWidth(band, it) },
                 modifier = Modifier.weight(1f),
                 enabled = config.isRadioEnabled == true,
             )
         }
         config.transmissionPower?.let { power ->
-            Spacer(Modifier.height(12.dp))
+            if (channel != null || width != null) Spacer(Modifier.height(12.dp))
             Text("Transmit power", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(6.dp))
             val options = (TransmissionPowers.all + power).distinct()

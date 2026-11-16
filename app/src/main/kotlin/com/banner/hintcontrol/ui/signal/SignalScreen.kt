@@ -455,7 +455,7 @@ private fun AdvancedCard(title: String, a: BaseAdvancedData, nr: Boolean, towerN
     SectionCard(title, null, trailing = { QualityPill(SignalQuality.overall(a.sector)) }) {
         BandPills(a.sector?.bands, nr)
         Spacer(Modifier.height(8.dp))
-        InfoRow("Bandwidth", a.bandwidth)
+        a.bandwidth?.let { InfoRow("Bandwidth", it) }
         InfoRow(if (nr) "NR-ARFCN" else "EARFCN", a.earfcn, copyable = true)
         InfoRow("PCI", a.pci, copyable = true)
         InfoRow("CQI", a.cqi?.toString())
