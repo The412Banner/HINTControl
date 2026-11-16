@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="live"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_signal"
+        android:shortcutShortLabel="@string/shortcut_live"
+        android:shortcutLongLabel="@string/shortcut_live_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="hintcontrol://live"
+            android:targetPackage="com.banner.hintcontrol"
+            android:targetClass="com.banner.hintcontrol.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="devices"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_devices"
+        android:shortcutShortLabel="@string/shortcut_devices"
+        android:shortcutLongLabel="@string/shortcut_devices">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="hintcontrol://devices"
+            android:targetPackage="com.banner.hintcontrol"
+            android:targetClass="com.banner.hintcontrol.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="reboot"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_reboot"
+        android:shortcutShortLabel="@string/shortcut_reboot"
+        android:shortcutLongLabel="@string/shortcut_reboot_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="hintcontrol://reboot"
+            android:targetPackage="com.banner.hintcontrol"
+            android:targetClass="com.banner.hintcontrol.MainActivity" />
+    </shortcut>
+</shortcuts>

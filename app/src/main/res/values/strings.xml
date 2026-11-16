@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Banners HINT</string>
+    <string name="widget_name">Gateway signal</string>
+    <string name="widget_description">5G and LTE signal from your gateway</string>
+    <string name="tile_name">Gateway signal</string>
+    <string name="shortcut_live">Live signal</string>
+    <string name="shortcut_live_long">Live signal meter</string>
+    <string name="shortcut_reboot">Reboot gateway</string>
+    <string name="shortcut_reboot_long">Reboot the gateway</string>
+    <string name="shortcut_devices">Devices</string>
+</resources>
