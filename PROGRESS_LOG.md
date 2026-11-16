@@ -17,6 +17,8 @@ Newest entry first. Times are US Eastern.
 ## 2026-11-16 ~05:00 EST — v1.0.0-pre2 release + in-app update test (feat/android-compose, in progress)
 **Why:** user picked option A: "publish pre2 and update through the app".
 **Plan:** release-cut commit 93b6e138 (versionCode 2, 1.0.0-pre2, release-notes/v1.0.0-pre2.md) → CI 43844143493 → verify APK (vc 2, vn 1.0.0-pre2, v1/v2/v3) → `gh release create v1.0.0-pre2 --target 93b6e1384b7a0cbee9b87c1210a641e16aaf44af --prerelease` with APK + .sha256 → verify → on the FIT open the installed pre1 → More → Updates → Download & install → allow unknown sources → Android confirm → check installed version + base.apk hash == release asset.
+**Published 05:01 EST:** https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0-pre2 — CI 43844143493 green; tag → 93b6e1384b7a0cbee9b87c1210a641e16aaf44af; prerelease (no Latest exists: API 404); assets HINTControl-v1.0.0-pre2-93b6e138.apk (3,329,576 B, sha256 2da4393a8324d662028c80fb5b2ec1bbab1d733bd1c7f69ac9b25622fd424a41, vc 2, vn 1.0.0-pre2, v1/v2/v3, cert a40da80a) + .sha256; re-downloaded hash matches; notes == release-notes/v1.0.0-pre2.md (+ trailing newline).
+**Next:** in-app update pre1 → pre2 on the FIT. User also asked: widget "Not on gateway network" fix goes into pre3.
 **Resume point:** if the session dies: check `gh release view v1.0.0-pre2 -R The412Banner/HINTControl`; on the FIT `dumpsys package com.banner.hintcontrol | grep versionName`; bring Termux back; tell root-d8 "done".
 
 ## 2026-11-16 04:30–04:55 EST — Device test on the Pocket FIT, demo mode (feat/android-compose, in progress)
