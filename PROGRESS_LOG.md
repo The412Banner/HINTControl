@@ -4,8 +4,8 @@ Newest entry first. Times are US Eastern.
 
 ## Resume point
 - **Stable v1.1.0 (Latest)** published 2026-11-16 08:43 EST, tag → c4dd42aca5a70518de1cfcd36329ec5c33990dc3 (speed test); main = feat/speed-test (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0}).
-- App name **Hint Plus**, app ID com.banner.hintcontrol. Real Arcadyan TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices proven. Pocket FIT runs 1.0.1.
-- Open: speed test on the device, HINT Control issues needing the real G5AR (#133, #120, #82), Wi-Fi save + reboot on the G5AR (ask first), update notification seen naturally, widget + tile on a device, demo false "RebootDetected" after app updates.
+- App name **Hint Plus**, app ID com.banner.hintcontrol. Real Arcadyan TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices proven. Pocket FIT runs 1.1.0 (speed test device-proven 08:45).
+- Open: HINT Control issues needing the real G5AR (#133, #120, #82), Wi-Fi save + reboot on the G5AR (ask first), update notification seen naturally, widget + tile on a device, demo false "RebootDetected" after app updates.
 
 ## Lessons learned (don't repeat these)
 - Count upload bytes only when the server confirms them: Android's send buffer takes megabytes at once, so counting at write time reports the buffer, not the link (first real speed test showed 0 Mbps up).
@@ -21,7 +21,7 @@ Newest entry first. Times are US Eastern.
 **Built f888b411:** gateway/speed/SpeedTest.kt; app: SpeedTestStore (last 50, SharedPreferences), NetworkInfo.activeConnection/wifiLinkMbps, ui/speed/SpeedTestScreen (VM + content), SpeedTestRoute, More row, Home card, launcher shortcut "Speed test" (hintcontrol://speedtest), Ookla button (<queries> org.zwanoo.android.speedtest), ACCESS_WIFI_STATE, PRIVACY + README; screenshots 19/20; LogicTest speed text. CI 43875658654 FAILED (compile: missing import of SpeedTestStore in AppContainer; the other errors were knock-on) → fixed 29b9ee97, CI 43876289752. User: "release it as 1.1.0 when it's green".
 **CI 43876289752 green** (screenshots 19/20 reviewed: result + running/dark). Release commit c4dd42aca5a70518de1cfcd36329ec5c33990dc3 (vc 8, 1.1.0, release-notes/v1.1.0.md), CI 43877328741.
 **Done 08:43 EST:** CI 43877328741 green (HintPlus-v1.1.0-c4dd42ac.apk, vc 8, 1.1.0, label Hint Plus, v1/v2/v3, cert a40da80a, sha256 b047d46ff27bee3d247ab3ccf559a761d2278dc58e7d0b883a6b6e61ee790cc3; speed test code present). Backup ref refs/backup/20261116/main-before-1.1.0 = 55bbb0d; main FF → c4d54c5 (differs from the release commit only in PROGRESS_LOG.md). **Stable v1.1.0 = Latest**: https://github.com/The412Banner/HINTControl/releases/tag/v1.1.0 — tag → c4dd42aca5a70518de1cfcd36329ec5c33990dc3 (on main), APK + .sha256, re-download matches, notes == file (+ final newline).
-**Proof level:** CI-green + engine tested against the real Cloudflare endpoints from the FIT on the G5AR; the 1.1.0 app itself not device-tested (FIT runs 1.0.1; the app will offer 1.1.0).
+**Device-proven 08:45 EST (user: "updated to 1.1.0, speed test works"):** FIT versionName 1.1.0 (vc 8, lastUpdateTime 08:45:08, base.apk sha256 b047d46f… == release); saved result 08:45:42: down 236.8 Mbps, up 2.1 Mbps, ping 83 ms, jitter 18 ms, server IAD, Wi-Fi link 4803 Mbps, 5G n41 RSRP -96 SINR 9, 281 MB used; no crash since 08:40.
 
 ## 2026-11-16 ~07:20–07:50 EST — 1.0.1: fixes from HINT Control issues (main, released)
 **Why:** user: "do 1-6 as 1.0.1, release it when green" (from the review of the 34 open HINT Control issues).
