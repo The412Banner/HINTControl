@@ -240,6 +240,27 @@ class ScreenshotTest {
     }
 
     @Test
+    fun updatesSamsungBlocked() = shot("22-updates-samsung-blocked") {
+        val release = AppRelease(
+            tag = "v1.1.2",
+            version = AppVersion.parse("1.1.2")!!,
+            title = "Hint Plus v1.1.2",
+            notes = "## New\n- **Did it stick?** check for Wi-Fi changes",
+            publishedAt = "2026-11-16T15:00:00Z",
+            pageUrl = "https://github.com/The412Banner/HINTControl/releases",
+            apk = GhAsset("HintPlus-v1.1.2.apk", "https://x", 9_400_000),
+            checksum = null,
+            prerelease = false,
+        )
+        androidx.compose.foundation.layout.Column(Modifier.padding(top = 24.dp)) {
+            UpdatesBody(
+                UpdateState.Failed("INSTALL_FAILED_ABORTED: User rejected permissions", release, atInstall = true),
+                AppSettings(lastUpdateCheck = now), true, {}, {}, { _, _ -> }, {}, {}, {}, {}, samsung = true,
+            )
+        }
+    }
+
+    @Test
     fun settings() = shot("13-settings") {
         androidx.compose.foundation.layout.Column(Modifier.padding(top = 24.dp)) {
             SettingsBody(AppSettings(), 1234, {}, {}, {})

@@ -62,7 +62,8 @@ sealed interface UpdateState {
     data class Verifying(val release: AppRelease) : UpdateState
     data class ReadyToInstall(val release: AppRelease, val file: File) : UpdateState
     data class Installing(val release: AppRelease) : UpdateState
-    data class Failed(val message: String, val release: AppRelease? = null) : UpdateState
+    /** [atInstall]: Android's installer refused or the install was cancelled (not a check or download problem). */
+    data class Failed(val message: String, val release: AppRelease? = null, val atInstall: Boolean = false) : UpdateState
 }
 
 /** Checks this app's GitHub releases and downloads newer builds. */
@@ -193,7 +194,7 @@ class UpdateRepository(
     fun installFinished(success: Boolean, message: String?) {
         val s = _state.value
         val release = (s as? UpdateState.Installing)?.release
-        _state.value = if (success) UpdateState.Idle else UpdateState.Failed(message ?: "Install cancelled", release)
+        _state.value = if (success) UpdateState.Idle else UpdateState.Failed(message ?: "Install cancelled", release, atInstall = true)
     }
 
     fun reset() {

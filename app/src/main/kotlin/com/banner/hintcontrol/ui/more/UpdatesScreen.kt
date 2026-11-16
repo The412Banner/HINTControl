@@ -2,6 +2,7 @@ package com.banner.hintcontrol.ui.more
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -105,6 +106,7 @@ fun UpdatesScreen() {
             onAllowInstall = { context.startActivity(UpdateInstaller.permissionIntent(context)) },
             onOpenPage = { url -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) } },
             onPrereleases = { vm.setPrereleases(it) },
+            samsung = Build.MANUFACTURER.equals("samsung", ignoreCase = true),
         )
     }
 }
@@ -121,6 +123,7 @@ fun UpdatesBody(
     onAllowInstall: () -> Unit,
     onOpenPage: (String) -> Unit,
     onPrereleases: (Boolean) -> Unit,
+    samsung: Boolean = false,
 ) {
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionCard("This version", Icons.Outlined.SystemUpdate) {
@@ -156,6 +159,7 @@ fun UpdatesBody(
             }
             is UpdateState.Failed -> SectionCard("Update problem", Icons.Outlined.ErrorOutline) {
                 Text(state.message, color = MaterialTheme.colorScheme.error)
+                if (samsung && state.atInstall) AutoBlockerTip()
                 TextButton(onClick = onCheck) { Text("Try again") }
             }
             else -> {}
@@ -181,6 +185,7 @@ fun UpdatesBody(
                         if (!canInstall) {
                             Text("Allow this app to install updates first.", style = MaterialTheme.typography.bodyMedium)
                             TextButton(onClick = onAllowInstall) { Text("Allow") }
+                            if (samsung) AutoBlockerTip()
                         }
                         Button(onClick = { onInstall(state.release, state.file) }, enabled = canInstall, modifier = Modifier.fillMaxWidth()) { Text("Install") }
                     }
@@ -193,4 +198,15 @@ fun UpdatesBody(
             }
         }
     }
+}
+
+/** Samsung's Auto Blocker (on by default since One UI 6.1.1) blocks installs from outside the Play Store. */
+@Composable
+private fun AutoBlockerTip() {
+    Text(
+        "Samsung: if Android blocks the install, turn off Auto Blocker in Settings → Security and privacy → Auto Blocker.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(vertical = 4.dp),
+    )
 }

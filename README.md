@@ -20,6 +20,8 @@ Hint Plus is not made by, endorsed by or affiliated with T-Mobile.
 
 Get the latest APK from **[Releases](https://github.com/The412Banner/HINTControl/releases/latest)**. Android 8.0 or newer.
 
+**Samsung phones:** Auto Blocker stops apps from being installed outside the Play Store. It's on by default on phones that shipped with One UI 6.1.1 or later. To install Hint Plus or its updates, turn it off under **Settings → Security and privacy → Auto Blocker**. Tip from Reddit user Hot-Bat-5813.
+
 After that, the app updates itself: it checks this repository's releases, shows what's new, downloads the APK, verifies its SHA-256 checksum and hands it to Android's installer.
 
 ## Supported gateways
