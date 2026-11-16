@@ -196,6 +196,7 @@ fun AlertsBody(s: AppSettings, set: ((AppSettings) -> AppSettings) -> Unit) {
     SettingRow("The gateway goes offline", subtitle = "Only while this phone is on its network", trailing = { Switch(s.alertOffline, { v -> set { it.copy(alertOffline = v) } }) })
     SettingRow("The gateway restarted", trailing = { Switch(s.alertReboot, { v -> set { it.copy(alertReboot = v) } }) })
     SettingRow("A new device joins", subtitle = "Needs a saved admin password", trailing = { Switch(s.alertNewDevice, { v -> set { it.copy(alertNewDevice = v) } }) })
+    SettingRow("The gateway's firmware changes", trailing = { Switch(s.alertFirmware, { v -> set { it.copy(alertFirmware = v) } }) })
     SettingRow("Signal gets weak", subtitle = "SINR below ${s.weakSinrThreshold} dB on two checks in a row", trailing = { Switch(s.alertWeakSignal, { v -> set { it.copy(alertWeakSignal = v) } }) })
     if (s.alertWeakSignal) {
         Column(Modifier.padding(horizontal = 16.dp)) {

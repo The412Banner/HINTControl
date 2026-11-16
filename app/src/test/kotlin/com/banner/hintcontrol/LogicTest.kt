@@ -39,6 +39,21 @@ class LogicTest {
     }
 
     @Test
+    fun `changes the gateway did not keep`() {
+        val sent = WifiConfig(
+            fiveGig = BandConfig(isRadioEnabled = true, channel = "149"),
+            ssids = listOf(SSIDConfig(ssidName = "Home", wpaKey = "password1"), SSIDConfig(ssidName = "Guest", wpaKey = "password2")),
+        )
+        // Gateway kept everything: nothing reported.
+        assertEquals(emptyList<String>(), WifiChanges.notKept(sent, sent))
+        // Gateway put the channel back to Auto and didn't add the second network.
+        val readBack = sent.copy(fiveGig = BandConfig(isRadioEnabled = true, channel = "Auto"), ssids = sent.ssids!!.take(1))
+        val missing = WifiChanges.notKept(readBack, sent)
+        assertTrue(missing.toString(), missing.any { "channel Auto → 149" in it })
+        assertTrue(missing.toString(), missing.any { "New network \"Guest\"" in it })
+    }
+
+    @Test
     fun `band changes become chart markers`() {
         fun sample(t: Long, nr: String?, lte: String?) = com.banner.hintcontrol.data.db.SignalSample(profileId = "p", time = t, nrBand = nr, lteBand = lte)
         val changes = com.banner.hintcontrol.ui.signal.bandChanges(listOf(sample(1, "n71", "b2"), sample(2, "n41", "b2"), sample(3, "n41", null)))

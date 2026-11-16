@@ -65,5 +65,6 @@ class Notifier(private val context: Context) {
         const val ID_SCHEDULED = 14
         const val ID_UPDATE = 15
         const val ID_SERVICE = 16
+        const val ID_FIRMWARE = 17
     }
 }

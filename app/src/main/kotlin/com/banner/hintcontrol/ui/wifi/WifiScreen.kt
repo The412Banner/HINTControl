@@ -228,8 +228,20 @@ fun WifiContent(ui: WifiUi, actions: WifiActions) {
     (ui.saveError ?: ui.savedMessage)?.let { msg ->
         AlertDialog(
             onDismissRequest = actions.dismissMessage,
-            title = { Text(if (ui.saveError != null) "Couldn't save" else "Saved") },
-            text = { Text(msg) },
+            title = { Text(if (ui.saveError != null) "Couldn't save" else if (ui.notKept.isNotEmpty()) "Not all changes stuck" else "Saved") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(msg)
+                    if (ui.saveError == null && ui.notKept.isNotEmpty()) {
+                        ui.notKept.forEach { Text("• Not kept: $it", style = MaterialTheme.typography.bodyMedium) }
+                        Text(
+                            "Some gateways choose these settings themselves (for example the channel), whatever the app sends.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            },
             confirmButton = { TextButton(onClick = actions.dismissMessage) { Text("OK") } },
         )
     }

@@ -27,6 +27,7 @@ class MonitorWorker(context: Context, params: WorkerParameters) : CoroutineWorke
             val main = c.session.status { it.mainData() }
             val now = System.currentTimeMillis()
             val obs = c.history.observe(profile.id, main, record = settings.recordHistory, minIntervalMs = 60_000, now = now)
+            c.notifyFirmware(profile.name, obs)
             c.summaries.save(main.toSummary(profile.name, now))
 
             if (prefs.getBoolean(KEY_OFFLINE, false)) {

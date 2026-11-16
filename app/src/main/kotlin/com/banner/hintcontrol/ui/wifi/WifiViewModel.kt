@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class WifiUi(
@@ -30,6 +31,8 @@ data class WifiUi(
     val saving: Boolean = false,
     val saveError: String? = null,
     val savedMessage: String? = null,
+    /** Changes the gateway accepted but didn't keep (read back after saving). */
+    val notKept: List<String> = emptyList(),
     val capabilities: GatewayCapabilities? = null,
     val kind: GatewayKind? = null,
 ) {
@@ -93,7 +96,7 @@ class WifiViewModel(private val c: AppContainer) : ViewModel() {
     fun addNetwork(ssid: SSIDConfig) = edit { it.addSsid(ssid) }
     fun removeNetwork(index: Int) = edit { it.removeSsid(index) }
     fun discard() = _ui.update { ui -> ui.original?.let { ui.copy(draft = WifiDraft.of(it), saveError = null) } ?: ui }
-    fun dismissMessage() = _ui.update { it.copy(saveError = null, savedMessage = null) }
+    fun dismissMessage() = _ui.update { it.copy(saveError = null, savedMessage = null, notKept = emptyList()) }
 
     fun save() {
         val ui = _ui.value
@@ -104,9 +107,25 @@ class WifiViewModel(private val c: AppContainer) : ViewModel() {
             _ui.update { it.copy(saving = true, saveError = null) }
             try {
                 c.session.authed { it.setWifiConfig(draft.config) }
-                c.profiles.active.value?.let { p -> c.history.addEvent(p.id, EventType.WifiSaved, summary.joinToString("; ").take(500)) }
-                val fresh = runCatching { c.session.authed { it.wifiConfig() } }.getOrNull() ?: draft.config
-                _ui.update { it.copy(saving = false, original = fresh, draft = WifiDraft.of(fresh), savedMessage = "Saved ${summary.size} change${if (summary.size == 1) "" else "s"}") }
+                // Read the settings back to see what the gateway actually kept: some gateways accept a
+                // change and then keep their own value (e.g. the channel). The Wi-Fi may restart, so retry.
+                var readBack: WifiConfig? = null
+                for (attempt in 1..3) {
+                    delay(3_000)
+                    readBack = runCatching { c.session.authed { it.wifiConfig() } }.getOrNull()
+                    if (readBack != null) break
+                }
+                val notKept = readBack?.let { WifiChanges.notKept(it, draft.config) }.orEmpty()
+                val fresh = readBack ?: draft.config
+                val detail = summary.joinToString("; ") + if (notKept.isEmpty()) "" else " (not kept: ${notKept.joinToString("; ")})"
+                c.profiles.active.value?.let { p -> c.history.addEvent(p.id, EventType.WifiSaved, detail.take(500)) }
+                val kept = summary.size - notKept.size
+                val message = when {
+                    notKept.isEmpty() -> "Saved ${summary.size} change${if (summary.size == 1) "" else "s"}"
+                    kept <= 0 -> "The gateway accepted the request but didn't keep the change."
+                    else -> "Saved $kept of ${summary.size} changes. The gateway didn't keep the others."
+                }
+                _ui.update { it.copy(saving = false, original = fresh, draft = WifiDraft.of(fresh), savedMessage = message, notKept = notKept) }
             } catch (e: Exception) {
                 _ui.update { it.copy(saving = false, saveError = e.userMessage()) }
             }

@@ -202,6 +202,7 @@ private fun eventIcon(t: EventType) = when (t) {
     EventType.NewDevice -> Icons.Outlined.Badge
     EventType.WifiSaved -> Icons.Outlined.Settings
     EventType.LoginChanged -> Icons.Outlined.Key
+    EventType.FirmwareUpdated -> Icons.Outlined.SystemUpdate
 }
 
 @Composable

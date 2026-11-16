@@ -62,6 +62,14 @@ class ContainerTest {
             c.history.setAlias(profile.id, clients.first().key, "My TV")
             assertEquals("My TV", c.history.devices(profile.id).first().first { it.deviceKey == clients.first().key }.alias)
 
+            // Firmware tracking: a new version after a known one is logged once.
+            val fw1 = live.main.copy(device = live.main.device?.copy(softwareVersion = "1.00.06"))
+            assertEquals(null, c.history.observe("fw", fw1, record = false, minIntervalMs = 0).firmwareChanged)
+            val fw2 = fw1.copy(device = fw1.device?.copy(softwareVersion = "1.00.07"))
+            assertEquals("1.00.06" to "1.00.07", c.history.observe("fw", fw2, record = false, minIntervalMs = 0).firmwareChanged)
+            assertEquals(EventType.FirmwareUpdated, c.history.events("fw").first().first().type)
+            assertEquals(null, c.history.observe("fw", fw2, record = false, minIntervalMs = 0).firmwareChanged)
+
             c.history.addEvent(profile.id, EventType.WifiSaved, "test")
             assertEquals(EventType.WifiSaved, c.history.events(profile.id).first().first().type)
 

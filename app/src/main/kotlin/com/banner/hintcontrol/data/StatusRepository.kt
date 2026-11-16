@@ -38,6 +38,7 @@ class StatusRepository(
     private val history: HistoryRepository,
     private val summaries: SummaryStore,
     private val onSummary: () -> Unit,
+    private val onObservation: (gatewayName: String, Observation) -> Unit = { _, _ -> },
 ) {
     private val _state = MutableStateFlow(LiveState())
     val state: StateFlow<LiveState> = _state.asStateFlow()
@@ -92,6 +93,7 @@ class StatusRepository(
             // watching, which must not cut a history write short. Errors here are not gateway errors.
             scope.launch {
                 runCatching { history.observe(profile.id, main, record = record, minIntervalMs = FOREGROUND_RECORD_MS, now = now) }
+                    .onSuccess { onObservation(profile.name, it) }
                     .onFailure { Log.w(TAG, "history: ${it.javaClass.simpleName}: ${it.message}") }
                 runCatching { summaries.save(main.toSummary(profile.name, now)) }
                 if (push) onSummary()

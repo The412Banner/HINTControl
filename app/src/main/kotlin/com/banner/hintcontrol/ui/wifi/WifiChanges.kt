@@ -39,6 +39,13 @@ data class WifiDraft(
 }
 
 object WifiChanges {
+    /**
+     * What the gateway didn't keep: compares the settings read back after saving with what was sent,
+     * network by network in order (the gateway returns its list in the same order).
+     */
+    fun notKept(readBack: WifiConfig, sent: WifiConfig): List<String> =
+        describe(readBack, WifiDraft(sent, sent.ssids.orEmpty().indices.map { i -> i.takeIf { it < readBack.ssids.orEmpty().size } }))
+
     fun describe(original: WifiConfig?, draft: WifiDraft?): List<String> {
         if (original == null || draft == null || original == draft.config) return emptyList()
         val edited = draft.config

@@ -17,9 +17,17 @@ data class Observation(
     val rebooted: Boolean,
     val nrBandChanged: Pair<String?, String?>?,
     val lteBandChanged: Pair<String?, String?>?,
+    /** Old → new firmware version, when it changed since the last check. */
+    val firmwareChanged: Pair<String, String>? = null,
 )
 
-class HistoryRepository(private val db: HistoryDatabase) {
+/** Last firmware version seen per gateway, kept across app restarts. */
+interface FirmwareMemory {
+    fun load(profileId: String): String?
+    fun save(profileId: String, version: String)
+}
+
+class HistoryRepository(private val db: HistoryDatabase, private val firmware: FirmwareMemory? = null) {
     private val mutex = Mutex()
     private val lastRecorded = mutableMapOf<String, Long>()
     private val lastSeen = mutableMapOf<String, SignalSample>()
@@ -80,7 +88,17 @@ class HistoryRepository(private val db: HistoryDatabase) {
         if (rebooted) addEvent(profileId, EventType.RebootDetected, "Uptime ${formatUptimeShort(sample.uptime)}", now)
         if (nrChanged != null) addEvent(profileId, EventType.BandChange, "5G ${nrChanged.first ?: "none"} → ${nrChanged.second ?: "none"}", now)
         if (lteChanged != null) addEvent(profileId, EventType.BandChange, "LTE ${lteChanged.first ?: "none"} → ${lteChanged.second ?: "none"}", now)
-        Observation(sample, rebooted, nrChanged, lteChanged)
+        // Gateways update their firmware on their own (pushed by the carrier); note it when it happens.
+        var firmwareChanged: Pair<String, String>? = null
+        main.device?.softwareVersion?.takeIf { it.isNotBlank() }?.let { version ->
+            val last = firmware?.load(profileId)
+            if (last != null && last != version) {
+                firmwareChanged = last to version
+                addEvent(profileId, EventType.FirmwareUpdated, "$last → $version", now)
+            }
+            if (last != version) firmware?.save(profileId, version)
+        }
+        Observation(sample, rebooted, nrChanged, lteChanged, firmwareChanged)
     }
 
     /** Updates the device list; returns devices never seen before (not on the very first run). */

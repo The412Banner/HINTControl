@@ -59,6 +59,7 @@ enum class EventType(val label: String) {
     WifiSaved("Wi-Fi settings saved"),
     WeakSignal("Weak signal"),
     LoginChanged("Admin login changed"),
+    FirmwareUpdated("Firmware updated"),
 }
 
 @Entity(tableName = "events", indices = [Index(value = ["profileId", "time"])])

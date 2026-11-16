@@ -67,6 +67,7 @@ data class AppSettings(
     val alertWeakSignal: Boolean = false,
     val weakSinrThreshold: Int = 0,
     val alertNewDevice: Boolean = false,
+    val alertFirmware: Boolean = true,
     val autoUpdateCheck: Boolean = true,
     val includePrereleases: Boolean = BuildConfig.VERSION_NAME.contains('-'),
     val lastUpdateCheck: Long = 0,
