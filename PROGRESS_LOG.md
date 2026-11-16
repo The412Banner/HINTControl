@@ -14,6 +14,11 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 04:30 EST — Device test on the Pocket FIT, demo mode (feat/android-compose, in progress)
+**Why:** user said "install it and test it in demo mode".
+**Plan:** pm install the staged 25b021a3 APK (hash host == device checked 04:25), check installed APK hash, launch, add the demo gateway, walk every tab (Home, Signal live/placement/history/cell, Devices, Wi-Fi edit + review, reboot, settings, updates check), check logcat for FATAL/crashes, bring Termux back.
+**Resume point:** if the session dies mid-test: package com.banner.hintcontrol may be installed and in front; bring Termux back (`am start -n com.termux/.app.TermuxActivity`), check `logcat -b crash`, peer root-d8 was told to hold off until "done" — send it "done". No background jobs.
+
 ## 2026-11-16 ~01:10 EST — Release candidate 25b021a3 (feat/android-compose, CI-green, NOT device-tested)
 **Runs:** 43812310757 (72ff4fbb) failed — Robolectric runtime download HTTP 429 → cache + pre-fetch (dd668919); 43812576886 failed — end-to-end test: no history sample within 10 s; 43812859446 (ba8f953b) green with a split test; root cause: the poller is cancelled when the last screen stops collecting, cutting the history write → side effects moved to the app scope (c05f3885, run 43813505611 green, poller-recorded sample now asserted). Wi-Fi save and admin-login change also moved to the app scope so leaving the screen can't cancel them; warning cleanup (25b021a3, run 43814242612 green).
 **Also:** navigation rail in landscape and on wide screens (Material's default used a bottom bar on short landscape windows, e.g. handhelds); verified in 18-shell-landscape.png.
