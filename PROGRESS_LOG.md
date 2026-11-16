@@ -12,6 +12,11 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~07:20 EST — 1.0.1: fixes from HINT Control issues (feat/upstream-fixes-1.0.1, in progress)
+**Why:** user: "do 1-6 as 1.0.1, release it when green" (from the review of the 34 open HINT Control issues).
+**Plan:** (1) #122 slow gateway: retry detection with a longer timeout; (2) #84 VPN: say when a VPN may block the gateway; (3) #2/#129/#134 correct password refused: explain the gateway restart fix; (4) #102 band-change markers on the history chart; (5) #127 optional fixed chart scale; (6) #24 tower nicknames. Then version 1.0.1 (vc 7) → CI green → backup ref → main fast-forward → stable release v1.0.1.
+**Resume point:** branch feat/upstream-fixes-1.0.1 off main 1940215.
+
 ## 2026-11-16 ~06:50–07:05 EST — Stable v1.0.0 + README rewrite + merge to main (main, released)
 **Why:** user: "updated to pre5, devices show now, can you release a stable release and rewrite the repo read me accurately, professionally and make sure to credit the original upstream work. also list what this app added and what makes it different simply" + "make sure everything is on the main branch also".
 **Verified first:** FIT pre5 installed (hash 25bf4132… == release); app DB has 10 devices for the real G5AR profile (fix device-proven), no crash.
