@@ -321,7 +321,12 @@ private fun HistoryTab(
             val changes = remember(ui.history) { bandChanges(ui.history) }
             if (changes.isNotEmpty()) {
                 SectionCard("Band changes", Icons.Outlined.SwapVert) {
-                    changes.takeLast(12).reversed().forEach { (t, text) -> InfoRow(Format.dateTime(t), text) }
+                    changes.takeLast(12).reversed().forEach { (t, text) ->
+                        Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+                            Text(text, style = MaterialTheme.typography.bodyMedium)
+                            Text(Format.dateTime(t), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {

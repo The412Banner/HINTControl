@@ -62,9 +62,9 @@ fun SectionCard(
         }
     }
     if (onClick != null) {
-        Card(onClick = onClick, modifier = modifier, shape = shape, colors = colors, content = inner)
+        Card(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = shape, colors = colors, content = inner)
     } else {
-        Card(modifier = modifier, shape = shape, colors = colors, content = inner)
+        Card(modifier = modifier.fillMaxWidth(), shape = shape, colors = colors, content = inner)
     }
 }
 
@@ -88,17 +88,19 @@ fun InfoRow(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(0.42f),
         )
-        Text(
-            value ?: "—",
-            style = MaterialTheme.typography.bodyMedium.merge(NumberStyle).let { if (mono) it.copy(fontFamily = FontFamily.Monospace) else it },
-            color = valueColor,
-            modifier = Modifier.weight(0.58f),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-        if (copyable && value != null) {
-            IconButton(onClick = { clipboard.setText(AnnotatedString(value)) }, modifier = Modifier.size(36.dp)) {
-                Icon(Icons.Outlined.ContentCopy, "Copy $label", modifier = Modifier.size(18.dp))
+        Row(Modifier.weight(0.58f), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                value ?: "—",
+                style = MaterialTheme.typography.bodyMedium.merge(NumberStyle).let { if (mono) it.copy(fontFamily = FontFamily.Monospace) else it },
+                color = valueColor,
+                modifier = Modifier.weight(1f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (copyable && value != null) {
+                IconButton(onClick = { clipboard.setText(AnnotatedString(value)) }, modifier = Modifier.size(36.dp)) {
+                    Icon(Icons.Outlined.ContentCopy, "Copy $label", modifier = Modifier.size(18.dp))
+                }
             }
         }
     }

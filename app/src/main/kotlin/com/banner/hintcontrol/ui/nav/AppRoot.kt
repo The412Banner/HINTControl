@@ -99,24 +99,10 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
         if (s.autoUpdateCheck && System.currentTimeMillis() - s.lastUpdateCheck > 6 * 3_600_000L) container.updates.check()
     }
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            TopDestination.entries.forEach { d ->
-                val selected = destination?.hierarchy?.any(d.matches) == true
-                item(
-                    selected = selected,
-                    onClick = { nav.goTop(d.route) },
-                    icon = {
-                        if (d == TopDestination.More && update is UpdateState.Available) {
-                            BadgedBox(badge = { Badge() }) { Icon(if (selected) d.selectedIcon else d.icon, d.label) }
-                        } else {
-                            Icon(if (selected) d.selectedIcon else d.icon, d.label)
-                        }
-                    },
-                    label = { Text(d.label) },
-                )
-            }
-        },
+    AppNavigationSuite(
+        isSelected = { d -> destination?.hierarchy?.any(d.matches) == true },
+        updateBadge = update is UpdateState.Available,
+        onSelect = { d -> nav.goTop(d.route) },
     ) {
         CompositionLocalProvider(LocalAppActions provides actions) {
             NavHost(nav, startDestination = OverviewRoute) {
@@ -152,4 +138,34 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
         )
     }
     if (phase != RebootPhase.Idle) RebootProgressDialog(phase, onDismiss = container.reboots::dismiss)
+}
+
+/** Bottom bar on phones, navigation rail on wide or landscape screens. */
+@Composable
+fun AppNavigationSuite(
+    isSelected: (TopDestination) -> Boolean,
+    updateBadge: Boolean,
+    onSelect: (TopDestination) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            TopDestination.entries.forEach { d ->
+                val selected = isSelected(d)
+                item(
+                    selected = selected,
+                    onClick = { onSelect(d) },
+                    icon = {
+                        if (d == TopDestination.More && updateBadge) {
+                            BadgedBox(badge = { Badge() }) { Icon(if (selected) d.selectedIcon else d.icon, d.label) }
+                        } else {
+                            Icon(if (selected) d.selectedIcon else d.icon, d.label)
+                        }
+                    },
+                    label = { Text(d.label) },
+                )
+            }
+        },
+        content = content,
+    )
 }

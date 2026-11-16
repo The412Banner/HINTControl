@@ -38,6 +38,8 @@ import com.banner.hintcontrol.ui.more.MoreUi
 import com.banner.hintcontrol.ui.more.SettingsBody
 import com.banner.hintcontrol.ui.more.UpdatesBody
 import com.banner.hintcontrol.ui.nav.AppActions
+import com.banner.hintcontrol.ui.nav.AppNavigationSuite
+import com.banner.hintcontrol.ui.nav.TopDestination
 import com.banner.hintcontrol.ui.nav.LocalAppActions
 import com.banner.hintcontrol.ui.overview.OverviewContent
 import com.banner.hintcontrol.ui.overview.OverviewUi
@@ -78,7 +80,7 @@ class ScreenshotTest {
     @get:Rule
     val compose = createComposeRule()
 
-    private val now = 1_763_280_000_000L
+    private val now = System.currentTimeMillis()
     private val demo = DemoGatewayClient(clock = { now }, latencyMs = 0)
     private val data = runBlocking {
         demo.login("admin", DemoGatewayClient.DEMO_PASSWORD)
@@ -243,6 +245,21 @@ class ScreenshotTest {
     @Test
     fun setupNotFound() = shot("15-setup-not-found", dark = true) {
         SetupContent(SetupUi(step = SetupStep.NotFound("No T-Mobile gateway answered at 192.168.12.1, 192.168.1.1.")), null, {}, {}, { _, _, _, _ -> }, {})
+    }
+
+    @Test
+    fun shellPortrait() = shot("17-shell-portrait") {
+        AppNavigationSuite(isSelected = { it == TopDestination.Overview }, updateBadge = true, onSelect = {}) {
+            OverviewContent(overviewUi, {}, {}, {}, {}, {}, {}, {}, {})
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "w891dp-h411dp-land-xhdpi")
+    fun shellLandscape() = shot("18-shell-landscape") {
+        AppNavigationSuite(isSelected = { it == TopDestination.Signal }, updateBadge = false, onSelect = {}) {
+            SignalContent(signalUi, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, { _, _ -> })
+        }
     }
 
     @Test
