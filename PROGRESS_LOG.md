@@ -19,7 +19,9 @@ Newest entry first. Times are US Eastern.
 ## 2026-11-16 ~10:35 EST — T-Life study for #82 (no code yet)
 **Why:** user: "download T-Life from an APK mirror and search it", then offered to install T-Life and log in.
 **Found (static, T-Life 12.4.0, signer CN=T-Mobile):** the gateway schedule API — GET/POST profile/schedules, DELETE profile/schedules?delete=<mac>; schedule = {mac, isEnabled, ban, timelines[{daysOfWeek ["monday"…], startTime "HH:mm", endTime "HH:mm"}]}; overnight split at 23:59/00:00. Also auth/pin, setup/onboard, gateway/reset?set=factoryReset (never use). `ban` meaning not proven.
-**Resume point:** 1.1.2 release-commit CI 43896063587 (9a036697) running → when green: backup ref, FF main, release v1.1.2. T-Life: user may install + log in and make a test block/schedule on a spare device → read profile/schedules read-only (no writes from me).
+**1.1.2 additions:** 9a036697 (version bump) CI 43896063587 GREEN; then user: "yes add the Auto Blocker tip to both" → 0a877367: README Download section + Updates screen tip on Samsung (install permission missing, or UpdateState.Failed.atInstall), release notes, screenshot 22; CI 43897312181 running.
+**T-Life:** user installed + logged in on the FIT (~10:45). Next: user blocks/schedules a SPARE device (not the FIT) in T-Life, then reads `profile/schedules` via Hint Plus More → Settings → Advanced → Developer options → More → API explorer (or I take the screen with their go). MACs stay out of repo/memory.
+**Resume point:** CI 43897312181 (0a877367) → green: backup ref, FF main, release v1.1.2 (target = 0a877367 full SHA). Then schedule format from the user's T-Life test.
 
 ## 2026-11-16 ~10:20 EST — 1.1.2 (feat/release-1.1.2, in CI)
 **Why:** user: "add all three to 1.1.2 and release when green" — demo restart fix (ca0c513), "did the Wi-Fi change stick" check (Reddit report: G5AR channel "reverts to Auto"), firmware change tracking (user asked whether the API can update firmware: no known endpoint; gateways get firmware from the carrier → track it instead).
