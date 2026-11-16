@@ -3,9 +3,10 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- **Stable v1.1.1 (Latest)** published 2026-11-16 09:57 EST, tag → 4d8a2f583695f5d74599bc0407cf0a4669d00928 (Android 17 "No gateway found" fix + G5AR Wi-Fi/Cell); main = feat/g5ar-items (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1}).
-- Real TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices, speed test proven (Pocket FIT, Android 14). Android 17 "No gateway found" fixed in 1.1.1 and device-proven on a Galaxy Z Fold 8 Ultra.
-- Open: #82 parental controls (needs a T-Life schedule to learn the format), Wi-Fi save + reboot on the G5AR (ask first), update notification seen naturally, widget + tile on a device.
+- **Stable v1.1.2 (Latest)** published 2026-11-16 10:44 EST, tag → d54a9414f58178e4803da7e8df243736bbe0d5fa (= release run 43898580367 headSha); assets HintPlus-v1.1.2-d54a9414.apk (sha256 14ee1060…, matches .sha256; AOSP testkey; vc 10) + .sha256. main = d54a9414 (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1,1.1.2}); branch feat/release-1.1.2 = main; fix/demo-reboot deleted (backup refs/backup/20261116/branch/fix/demo-reboot).
+- 1.1.2 = "did the Wi-Fi change stick" check, firmware change tracking + alert, Samsung Auto Blocker tip (README + updater), demo restart fix. NOT device-tested yet (user updates via the app).
+- Real TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices, speed test proven (Pocket FIT, Android 14). Android 17 "No gateway found" fixed in 1.1.1, device-proven on a Galaxy Z Fold 8 Ultra; Reddit user confirmed on an S26 Ultra.
+- Open: manual firmware upload (plan proposed, awaiting go; can't be device-tested without a real firmware file; no way to copy the gateway's own firmware), #82 parental controls PARKED by user (format known from T-Life code), Wi-Fi save + reboot on the G5AR (ask first), widget + tile on a device.
 
 ## Lessons learned (don't repeat these)
 - Back up before deleting, and make the delete depend on the backup succeeding (`backup && delete`); run git refspec loops in bash, not zsh (zsh treats `$var:r…` as a modifier and doesn't word-split `set -- $pair`).
@@ -15,6 +16,12 @@ Newest entry first. Times are US Eastern.
 - Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
+
+## 2026-11-16 10:44 EST — v1.1.2 released (main, stable/Latest)
+**Why:** user: "add all three to 1.1.2 and release when green" + "yes add the Auto Blocker tip to both".
+**Release:** feat/release-1.1.2 CI 43897312181 GREEN (0a877367, last code commit; later commits = PROGRESS_LOG only) → backup refs/backup/20261116/main-before-1.1.2 = bb6c9c71 → main fast-forwarded to d54a9414 → release run 43898580367 (workflow_dispatch on main, headSha d54a9414) GREEN → v1.1.2 Latest, not prerelease, tag → d54a9414; APK sha256 14ee1060… matches the .sha256 asset; signer AOSP testkey (a40da80a…); versionCode 10 / 1.1.2; notes = release-notes/v1.1.2.md. fix/demo-reboot backed up + deleted (merged).
+**~11:00 user: "can you pull a copy of the gateway's firmware?"** → no: no download/backup endpoint in the gateway's web page or T-Life; TCP from the FIT: only 53, 80, 8080 open (21, 22, 23, 443, 3517, 7547, 8443 closed).
+**Device test:** NOT device-tested (user updates through the app).
 
 ## 2026-11-16 ~10:35 EST — T-Life study for #82 (no code yet)
 **Why:** user: "download T-Life from an APK mirror and search it", then offered to install T-Life and log in.
