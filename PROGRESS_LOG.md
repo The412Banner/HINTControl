@@ -14,6 +14,12 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~06:00 EST — First real gateway (feat/android-compose, read-only checks)
+**Why:** user: "updated to pre4, shows Hint Plus, I am on my T-Mobile gateway now also".
+**pre4 on the FIT (user-updated via the app):** versionCode 4 / 1.0.0-pre4, lastUpdateTime 05:59:20, installed base.apk sha256 57b8724c… == release; launcher shows "Hint Plus" (user).
+**Real gateway, read-only (no login, nothing changed):** phone 192.168.12.x via 192.168.12.1. Raw `GET :8080/TMI/v1/gateway?get=all` → 200, 680 bytes: Arcadyan TMO-G5AR, firmware 1.00.06, 5G SA only (n41, no "4g" object), bars sent as 3.0. The app's own gateway code (local probe test, not committed): GatewayDiscovery.detect → Tmi at 192.168.12.1; mainData parsed (model, fw, n41, RSRP -101, RSRQ -10, SINR 7, RSSI -89, gNB/cell, uptime); score 44 "Poor" (RSRP < -100); cell details + devices → Unauthorized "Log in to the gateway first" (expected without the admin password). Private values (serial, MAC, cell IDs) kept out of the repo and memory.
+**Next:** user adds the gateway in the app (More → Gateways) and logs in with the admin password; then Wi-Fi/devices/cell/reboot on real hardware.
+
 ## 2026-11-16 ~05:40 EST — Rename to "Hint Plus" + v1.0.0-pre4 (feat/android-compose, pre4 published)
 **Why:** user: "rename the app to Hint Plus" (also confirmed "updater worked" for pre2 → pre3, verified on the FIT).
 **Built:** 3b2aec9c — launcher label (app_name), About card, shared report header, update-check User-Agent (HintPlus/<ver>), README/PRIVACY titles, CI APK name HintPlus-v<ver>-<sha8>.apk + artifact HintPlus-apk, release title. Kept on purpose: application ID com.banner.hintcontrol (changing it = a separate app, no in-place update, data lost) and the GitHub repo name (installed copies look for updates there). Upstream HINT Control credits unchanged. CI 43850365825 running.
