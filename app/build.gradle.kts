@@ -18,8 +18,8 @@ android {
         applicationId = "com.banner.hintcontrol"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0.0-pre3"
+        versionCode = 4
+        versionName = "1.0.0-pre4"
         buildConfigField("String", "GIT_SHA", "\"$gitSha\"")
         buildConfigField("String", "UPDATE_REPO", "\"The412Banner/HINTControl\"")
         buildConfigField("String", "UPSTREAM_REPO", "\"zacharee/HINTControl\"")
