@@ -14,6 +14,12 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~09:00 EST — G5AR items from HINT Control issues: #120, #133, #82 (feat/g5ar-items, in progress)
+**Why:** user: "do the 3 G5AR items next".
+**Research (facts only, no code copied — neither repo has a licence):** rchen14b/TMO-G5AR-Portal (G5AR web admin): Wi-Fi v2 `get=ap` modelled with only `isRadioEnabled` per radio + ssids (no channel/width/power/bandSteering); clients include `wifi`. christopherjnelson/Arcadyan-5G-Web-Admin (KVD21): v2 config has channel/channelBandwidth/mode/transmissionPower + bandSteering.isEnabled; README mentions unprobed `/TMI/v1/profile/schedules` (likely T-Life Profiles = parental controls).
+**Plan:** read-only GETs on the user's G5AR through the app's API explorer (app keeps the password): network/configuration/v2?get=ap, network/telemetry/?get=cell, version, profile/schedules (+ variants). Then: hide Wi-Fi controls the gateway doesn't report (#120), band steering only when reported (#133; a save test needs the user's OK — drops Wi-Fi), parental controls only if an endpoint exists (#82).
+**Resume point:** branch feat/g5ar-items off main; FIT runs 1.1.0; I'm driving the FIT screen (developer mode → API explorer); peer root-d8 told.
+
 ## 2026-11-16 ~08:20–08:45 EST — 1.1.0: built-in speed test (main, released)
 **Why:** user: "updated to 1.0.1, works, can we add a simple speed test to the app, like ookla or something?" → options given (Ookla has no free API for other apps; M-Lab publishes testers' IPs) → user: "yes do it" for: Cloudflare-based test (speed.cloudflare.com, reference code MIT, endpoints checked 200) + "Open Speedtest by Ookla" button, release as 1.1.0 when green.
 **Plan:** engine in gateway module (plain Kotlin + OkHttp, MockWebServer tests): ping/jitter from small requests, download/upload with parallel streams, time + data caps, live progress, server from cf-ray; app: Speed test screen (More + Home card), results saved with the gateway signal at test time (band, RSRP, SINR) and phone Wi-Fi link speed, mobile-data confirm, Ookla button; PRIVACY/README updates; version 1.1.0 (vc 8).
