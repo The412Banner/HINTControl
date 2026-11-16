@@ -24,15 +24,19 @@ object GatewayDiscovery {
      * Tries every host in order (all hosts in parallel, both API styles per host) and returns
      * the first that answers. TMI wins over Nokia on the same host, as in the old app.
      */
-    suspend fun detect(hosts: List<String>, http: OkHttpClient = GatewayHttp.base): DetectedGateway {
+    suspend fun detect(
+        hosts: List<String>,
+        http: OkHttpClient = GatewayHttp.base,
+        timeoutMs: Long = GatewayHttp.PROBE_TIMEOUT_MS,
+    ): DetectedGateway {
         val candidates = hosts.map(GatewayAddress::normalize).distinct()
         val found = coroutineScope {
             candidates.map { host ->
                 async {
                     val tmi = TmiGatewayClient(host, http)
                     val nokia = NokiaGatewayClient(host, http)
-                    val tmiOk = async { tmi.exists() }
-                    val nokiaOk = async { nokia.exists() }
+                    val tmiOk = async { tmi.exists(timeoutMs) }
+                    val nokiaOk = async { nokia.exists(timeoutMs) }
                     when {
                         tmiOk.await() -> {
                             nokiaOk.cancel()

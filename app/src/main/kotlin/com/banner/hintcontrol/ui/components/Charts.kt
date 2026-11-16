@@ -47,6 +47,10 @@ data class ChartPoint(val x: Long, val y: Float)
 @Immutable
 data class ChartSeries(val label: String, val color: Color, val points: List<ChartPoint>)
 
+/** A labelled vertical line at a point in time, e.g. a band change. */
+@Immutable
+data class ChartMarker(val x: Long, val label: String)
+
 /**
  * Line chart with grid, Y labels and time labels. Drag or tap to read values at a point in time.
  * Gaps longer than [gapMs] break the line (e.g. when the app wasn't recording).
@@ -59,6 +63,9 @@ fun LineChart(
     unit: String = "",
     gapMs: Long = 20 * 60_000L,
     xLabel: (Long) -> String = Format::time,
+    markers: List<ChartMarker> = emptyList(),
+    /** Fixed Y range; widened only if a reading falls outside it. Null = fit the data. */
+    fixedRange: ClosedFloatingPointRange<Float>? = null,
 ) {
     val all = series.flatMap { it.points }
     if (all.isEmpty()) {
@@ -69,8 +76,8 @@ fun LineChart(
     }
     val minX = all.minOf { it.x }
     val maxX = all.maxOf { it.x }.let { if (it == minX) minX + 1 else it }
-    val rawMin = all.minOf { it.y }
-    val rawMax = all.maxOf { it.y }
+    val rawMin = all.minOf { it.y }.let { if (fixedRange != null) minOf(it, fixedRange.start) else it }
+    val rawMax = all.maxOf { it.y }.let { if (fixedRange != null) maxOf(it, fixedRange.endInclusive) else it }
     val step = niceStep((rawMax - rawMin).coerceAtLeast(4f) / 4f)
     val minY = floor(rawMin / step) * step
     val maxY = (ceil(rawMax / step) * step).let { if (it <= minY) minY + step else it }
@@ -79,6 +86,8 @@ fun LineChart(
     val labelStyle = MaterialTheme.typography.labelSmall.merge(NumberStyle).copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
     val gridColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
     val cursorColor = MaterialTheme.colorScheme.onSurface
+    val markerColor = MaterialTheme.colorScheme.secondary
+    val markerStyle = MaterialTheme.typography.labelSmall.copy(color = markerColor)
     var cursorX by remember(series) { mutableStateOf<Long?>(null) }
 
     Column(modifier) {
@@ -169,6 +178,19 @@ fun LineChart(
                 drawPath(fill, Brush.verticalGradient(listOf(s.color.copy(alpha = 0.22f), Color.Transparent), startY = 0f, endY = h))
                 drawPath(path, s.color, style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
                 if (s.points.size == 1) drawCircle(s.color, 4.dp.toPx(), Offset(px(s.points[0].x), py(s.points[0].y)))
+            }
+
+            var labelEnd = -1f
+            markers.forEach { m ->
+                if (m.x < minX || m.x > maxX) return@forEach
+                val x = px(m.x)
+                drawLine(markerColor.copy(alpha = 0.6f), Offset(x, 0f), Offset(x, h), strokeWidth = 1.5f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 6f)))
+                val text = measurer.measure(m.label, markerStyle)
+                val left = (x + 4f).coerceAtMost(size.width - text.size.width)
+                if (left > labelEnd + 6f) {
+                    drawText(text, topLeft = Offset(left, 0f))
+                    labelEnd = left + text.size.width
+                }
             }
 
             cursorX?.let { t ->

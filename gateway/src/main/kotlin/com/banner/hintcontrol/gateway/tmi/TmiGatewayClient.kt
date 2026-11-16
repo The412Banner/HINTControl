@@ -90,8 +90,8 @@ class TmiGatewayClient(
         const val RESET_LOGIN = "auth/admin/reset"
     }
 
-    override suspend fun exists(): Boolean = try {
-        val r = http.withTimeout(GatewayHttp.PROBE_TIMEOUT_MS).await(get(Endpoints.GATEWAY_INFO, authed = false))
+    override suspend fun exists(timeoutMs: Long): Boolean = try {
+        val r = http.withTimeout(timeoutMs).await(get(Endpoints.GATEWAY_INFO, authed = false))
         r.code != 404 && r.code != 403
     } catch (e: CancellationException) {
         throw e

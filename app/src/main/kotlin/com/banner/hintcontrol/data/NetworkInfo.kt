@@ -6,6 +6,22 @@ import android.net.NetworkCapabilities
 import java.net.Inet4Address
 
 object NetworkInfo {
+    @Volatile private var appContext: Context? = null
+
+    /** Called from Application.onCreate so error messages can check the network without a Context. */
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
+
+    /** True when a VPN is up; many VPNs send local traffic away from the gateway (HINT Control #84). */
+    @Suppress("DEPRECATION")
+    fun vpnActive(context: Context? = appContext): Boolean {
+        val cm = context?.getSystemService(ConnectivityManager::class.java) ?: return false
+        return runCatching {
+            cm.allNetworks.any { cm.getNetworkCapabilities(it)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true }
+        }.getOrDefault(false)
+    }
+
     /** IPv4 default gateways of the phone's Wi-Fi and Ethernet networks (usually the router). */
     @Suppress("DEPRECATION")
     fun localGateways(context: Context): List<String> {

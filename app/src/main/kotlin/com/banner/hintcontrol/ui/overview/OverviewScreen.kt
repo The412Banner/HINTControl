@@ -61,6 +61,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.banner.hintcontrol.AppContainer
+import com.banner.hintcontrol.data.towerKey
 import com.banner.hintcontrol.data.Access
 import com.banner.hintcontrol.data.GatewayProfile
 import com.banner.hintcontrol.data.LiveState
@@ -110,6 +111,7 @@ data class OverviewUi(
     val clientCounts: Map<ClientLink, Int>? = null,
     val trendNr: List<Float> = emptyList(),
     val trendLte: List<Float> = emptyList(),
+    val towerNames: Map<String, String> = emptyMap(),
 )
 
 class OverviewViewModel(private val c: AppContainer) : ViewModel() {
@@ -119,7 +121,9 @@ class OverviewViewModel(private val c: AppContainer) : ViewModel() {
         if (p == null) flowOf(emptyList()) else c.history.samples(p.id, System.currentTimeMillis() - 30 * 60_000L)
     }
 
-    val ui: StateFlow<OverviewUi> = combine(c.status.state, c.profiles.state, c.session.access, counts, trend) { live, profiles, access, counts, samples ->
+    private val trendAndNames = combine(trend, c.settings.settings) { samples, s -> samples to s.towerNames }
+
+    val ui: StateFlow<OverviewUi> = combine(c.status.state, c.profiles.state, c.session.access, counts, trendAndNames) { live, profiles, access, counts, (samples, names) ->
         OverviewUi(
             profile = profiles.active,
             profiles = profiles.profiles,
@@ -128,6 +132,7 @@ class OverviewViewModel(private val c: AppContainer) : ViewModel() {
             clientCounts = counts,
             trendNr = samples.mapNotNull { it.nrSinr?.toFloat() },
             trendLte = samples.mapNotNull { it.lteSinr?.toFloat() },
+            towerNames = names,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), OverviewUi())
 
@@ -286,8 +291,8 @@ private fun OverviewGrid(
             }
         }
         item(span = StaggeredGridItemSpan.FullLine) { HeroCard(main, nr, lte, ui.live.updatedAt, onSignal) }
-        if (nr != null) item { RadioCard("5G", nr, true) }
-        if (lte != null) item { RadioCard("LTE", lte, false) }
+        if (nr != null) item { RadioCard("5G", nr, true, ui.towerNames) }
+        if (lte != null) item { RadioCard("LTE", lte, false, ui.towerNames) }
         if (nr == null && lte == null) item {
             SectionCard("Radio", Icons.AutoMirrored.Outlined.ShowChart) { Text("The gateway reports no cellular connection right now.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
@@ -346,7 +351,7 @@ private fun HeroCard(main: MainData, nr: BaseCellData?, lte: BaseCellData?, upda
 }
 
 @Composable
-private fun RadioCard(title: String, cell: BaseCellData, nr: Boolean) {
+private fun RadioCard(title: String, cell: BaseCellData, nr: Boolean, towerNames: Map<String, String> = emptyMap()) {
     val quality = SignalQuality.overall(cell)
     SectionCard(title = title, trailing = { SignalBars(cell.bars, quality) }) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -359,6 +364,7 @@ private fun RadioCard(title: String, cell: BaseCellData, nr: Boolean) {
             MetricBar(Metric.RSSI, cell.rssi, Modifier.weight(1f))
         }
         val ids = listOfNotNull(
+            cell.nbid?.takeIf { it > 0 }?.let { towerNames[towerKey(nr, it)] },
             cell.nbid?.takeIf { it > 0 }?.let { "${if (nr) "gNB" else "eNB"} $it" },
             cell.cid?.takeIf { it > 0 }?.let { "cell $it" },
         )

@@ -88,8 +88,8 @@ class NokiaGatewayClient(
         KnownEndpoint("SIM", "GET", Endpoints.SIM),
     )
 
-    override suspend fun exists(): Boolean = try {
-        http.withTimeout(GatewayHttp.PROBE_TIMEOUT_MS)
+    override suspend fun exists(timeoutMs: Long): Boolean = try {
+        http.withTimeout(timeoutMs)
             .await(Request.Builder().url(url(Endpoints.DEVICE_STATUS)).get().build())
             .isSuccess
     } catch (e: CancellationException) {

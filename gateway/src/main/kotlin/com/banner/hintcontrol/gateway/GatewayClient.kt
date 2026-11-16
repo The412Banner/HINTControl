@@ -55,7 +55,7 @@ interface GatewayClient {
     val knownEndpoints: List<KnownEndpoint>
 
     /** Quick check that this kind of gateway answers at [host]. Never throws. */
-    suspend fun exists(): Boolean
+    suspend fun exists(timeoutMs: Long = GatewayHttp.PROBE_TIMEOUT_MS): Boolean
 
     suspend fun login(username: String, password: String)
 

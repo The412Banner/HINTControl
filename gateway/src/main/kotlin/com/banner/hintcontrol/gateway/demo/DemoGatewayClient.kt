@@ -109,7 +109,7 @@ class DemoGatewayClient(
         if (!loggedIn) throw GatewayException.Unauthorized("Log in to the gateway first")
     }
 
-    override suspend fun exists(): Boolean = clock() >= offlineUntil
+    override suspend fun exists(timeoutMs: Long): Boolean = clock() >= offlineUntil
 
     override suspend fun login(username: String, password: String) {
         online()

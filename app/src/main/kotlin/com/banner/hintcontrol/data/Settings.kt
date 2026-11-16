@@ -80,7 +80,14 @@ data class AppSettings(
     val automationToken: String = "",
     /** Android 13+: the notification permission prompt has been shown once (alerts and update notices need it). */
     val askedNotifications: Boolean = false,
+    /** History chart: fixed Y range per metric instead of fitting the data (HINT Control #127). */
+    val fixedChartScale: Boolean = false,
+    /** Your names for cell towers, keyed by [towerKey] (HINT Control #24). */
+    val towerNames: Map<String, String> = emptyMap(),
 )
+
+/** Key for a tower name: radio type plus eNB/gNB ID, e.g. "nr:1054776". */
+fun towerKey(nr: Boolean, nodeId: Long): String = "${if (nr) "nr" else "lte"}:$nodeId"
 
 class SettingsRepository(private val store: DataStore<Preferences>, scope: CoroutineScope) {
     private val key = stringPreferencesKey("settings_json")

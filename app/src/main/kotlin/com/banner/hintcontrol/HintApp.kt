@@ -3,6 +3,7 @@ package com.banner.hintcontrol
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.banner.hintcontrol.data.NetworkInfo
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -17,6 +18,7 @@ class HintApp : Application() {
     override fun onCreate() {
         super.onCreate()
         installCrashLog()
+        NetworkInfo.init(this)
         container = AppContainer(this)
         container.notifier.createChannels()
         container.scope.launch {

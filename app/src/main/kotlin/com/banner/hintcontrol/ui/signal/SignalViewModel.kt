@@ -72,6 +72,8 @@ data class SignalUi(
     val access: Access = Access.Anonymous,
     val loginBusy: Boolean = false,
     val loginError: String? = null,
+    val fixedScale: Boolean = false,
+    val towerNames: Map<String, String> = emptyMap(),
 ) {
     fun cell(tech: Tech): BaseCellData? = when (tech) {
         Tech.NR -> live.main?.signal?.fiveG
@@ -99,6 +101,8 @@ class SignalViewModel(private val c: AppContainer) : ViewModel() {
             history = history,
             access = access,
             recording = s.recordHistory,
+            fixedScale = s.fixedChartScale,
+            towerNames = s.towerNames,
             placement = l.placement.copy(sound = s.placementSound, haptics = s.placementHaptics, keepScreenOn = s.keepScreenOn),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SignalUi())
@@ -128,6 +132,16 @@ class SignalViewModel(private val c: AppContainer) : ViewModel() {
     fun setRange(r: HistoryRange) = local.update { it.copy(range = r) }
 
     fun setMetric(m: Metric) = local.update { it.copy(metric = m) }
+
+    fun setFixedScale(on: Boolean) = viewModelScope.launch { c.settings.update { it.copy(fixedChartScale = on) } }
+
+    /** Blank [name] removes the tower's name. */
+    fun setTowerName(key: String, name: String) = viewModelScope.launch {
+        c.settings.update { s ->
+            val trimmed = name.trim().take(40)
+            s.copy(towerNames = if (trimmed.isEmpty()) s.towerNames - key else s.towerNames + (key to trimmed))
+        }
+    }
 
     fun setPlacement(on: Boolean) {
         c.status.setFastMode(on)

@@ -28,6 +28,15 @@ class LogicTest {
     private fun v(s: String) = AppVersion.parse(s)!!
 
     @Test
+    fun `band changes become chart markers`() {
+        fun sample(t: Long, nr: String?, lte: String?) = com.banner.hintcontrol.data.db.SignalSample(profileId = "p", time = t, nrBand = nr, lteBand = lte)
+        val changes = com.banner.hintcontrol.ui.signal.bandChanges(listOf(sample(1, "n71", "b2"), sample(2, "n41", "b2"), sample(3, "n41", null)))
+        assertEquals(listOf("5G n71 → n41", "LTE b2 → none"), changes.map { it.text })
+        assertEquals(listOf(2L, 3L), changes.map { it.time })
+        assertEquals("tower key", "nr:1054776", com.banner.hintcontrol.data.towerKey(true, 1054776))
+    }
+
+    @Test
     fun `chart cursor snaps to the nearest reading`() {
         // Plot 100 px wide after a 0 px label column; readings at t = 0, 30, 100 (of 0..100).
         val pts = listOf(ChartPoint(0, 1f), ChartPoint(30, 2f), ChartPoint(100, 3f))

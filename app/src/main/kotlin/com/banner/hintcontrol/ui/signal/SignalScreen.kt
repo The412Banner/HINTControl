@@ -21,12 +21,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.SettingsInputAntenna
 import androidx.compose.material.icons.outlined.SwapVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -59,6 +62,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.banner.hintcontrol.data.Access
+import com.banner.hintcontrol.data.towerKey
 import com.banner.hintcontrol.data.db.SignalSample
 import com.banner.hintcontrol.gateway.model.BaseAdvancedData
 import com.banner.hintcontrol.gateway.model.CellDataRoot
@@ -67,6 +71,7 @@ import com.banner.hintcontrol.gateway.signal.CellMath
 import com.banner.hintcontrol.gateway.signal.Metric
 import com.banner.hintcontrol.gateway.signal.SignalQuality
 import com.banner.hintcontrol.ui.components.BandPills
+import com.banner.hintcontrol.ui.components.ChartMarker
 import com.banner.hintcontrol.ui.components.ChartPoint
 import com.banner.hintcontrol.ui.components.ChartSeries
 import com.banner.hintcontrol.ui.components.ErrorBox
@@ -115,6 +120,8 @@ fun SignalScreen() {
         onHaptics = { vm.setHaptics(it) },
         onRange = vm::setRange,
         onMetric = vm::setMetric,
+        onFixedScale = { vm.setFixedScale(it) },
+        onTowerName = { key, name -> vm.setTowerName(key, name) },
         onExport = { exporter.launch("gateway-signal-${System.currentTimeMillis() / 1000}.csv") },
         onClear = { vm.clearHistory() },
         onLoadCell = vm::loadCell,
@@ -137,6 +144,8 @@ fun SignalContent(
     onLoadCell: () -> Unit,
     onLogin: (String, Boolean) -> Unit,
     initialTab: Int = 0,
+    onFixedScale: (Boolean) -> Unit = {},
+    onTowerName: (String, String) -> Unit = { _, _ -> },
 ) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     Scaffold(topBar = { TopAppBar(title = { Text("Signal") }) }) { padding ->
@@ -148,10 +157,10 @@ fun SignalContent(
             }
             when (tab) {
                 0 -> LiveTab(ui, onTech, onPlacement, onResetBest, onSound, onHaptics)
-                1 -> HistoryTab(ui, onRange, onMetric, onExport, onClear)
+                1 -> HistoryTab(ui, onRange, onMetric, onFixedScale, onExport, onClear)
                 else -> {
                     LaunchedEffect(Unit) { if (ui.cell.data == null) onLoadCell() }
-                    CellTab(ui, onLoadCell, onLogin)
+                    CellTab(ui, onLoadCell, onLogin, onTowerName)
                 }
             }
         }
@@ -272,6 +281,7 @@ private fun HistoryTab(
     ui: SignalUi,
     onRange: (HistoryRange) -> Unit,
     onMetric: (Metric) -> Unit,
+    onFixedScale: (Boolean) -> Unit,
     onExport: () -> Unit,
     onClear: () -> Unit,
 ) {
@@ -287,6 +297,7 @@ private fun HistoryTab(
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Metric.entries.forEach { m -> FilterChip(ui.metric == m, { onMetric(m) }, label = { Text(m.label) }) }
+                FilterChip(ui.fixedScale, { onFixedScale(!ui.fixedScale) }, label = { Text("Fixed scale") })
             }
             val nrColor = MaterialTheme.colorScheme.primary
             val lteColor = MaterialTheme.colorScheme.tertiary
@@ -296,6 +307,8 @@ private fun HistoryTab(
                     ChartSeries("LTE", lteColor, ui.history.mapNotNull { s -> s.value(ui.metric, false)?.let { ChartPoint(s.time, it.toFloat()) } }.downsample()),
                 ).filter { it.points.isNotEmpty() }
             }
+            val changes = remember(ui.history) { bandChanges(ui.history) }
+            val markers = remember(changes) { changes.map { ChartMarker(it.time, it.to ?: "none") } }
             SectionCard("${ui.metric.label} (${ui.metric.unit})", null) {
                 LineChart(
                     series,
@@ -303,6 +316,8 @@ private fun HistoryTab(
                     unit = " ${ui.metric.unit}",
                     gapMs = maxOf(20 * 60_000L, ui.range.ms / 50),
                     xLabel = if (ui.range.ms > 86_400_000L) Format::day else Format::time,
+                    markers = markers,
+                    fixedRange = if (ui.fixedScale) ui.metric.chartRange else null,
                 )
                 if (!ui.recording) {
                     Spacer(Modifier.height(8.dp))
@@ -318,13 +333,12 @@ private fun HistoryTab(
                     InfoRow("Readings", "${ui.history.size}")
                 }
             }
-            val changes = remember(ui.history) { bandChanges(ui.history) }
             if (changes.isNotEmpty()) {
                 SectionCard("Band changes", Icons.Outlined.SwapVert) {
-                    changes.takeLast(12).reversed().forEach { (t, text) ->
+                    changes.takeLast(12).reversed().forEach { ch ->
                         Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                            Text(text, style = MaterialTheme.typography.bodyMedium)
-                            Text(Format.dateTime(t), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(ch.text, style = MaterialTheme.typography.bodyMedium)
+                            Text(Format.dateTime(ch.time), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -354,32 +368,45 @@ private fun HistoryTab(
     }
 }
 
-private fun bandChanges(samples: List<SignalSample>): List<Pair<Long, String>> {
-    val out = mutableListOf<Pair<Long, String>>()
+internal data class BandChange(val time: Long, val radio: String, val from: String?, val to: String?) {
+    val text: String get() = "$radio ${from ?: "none"} → ${to ?: "none"}"
+}
+
+internal fun bandChanges(samples: List<SignalSample>): List<BandChange> {
+    val out = mutableListOf<BandChange>()
     var prevNr: String? = null
     var prevLte: String? = null
     samples.forEachIndexed { i, s ->
-        if (i > 0 && s.nrBand != prevNr) out += s.time to "5G ${prevNr ?: "none"} → ${s.nrBand ?: "none"}"
-        if (i > 0 && s.lteBand != prevLte) out += s.time to "LTE ${prevLte ?: "none"} → ${s.lteBand ?: "none"}"
+        if (i > 0 && s.nrBand != prevNr) out += BandChange(s.time, "5G", prevNr, s.nrBand)
+        if (i > 0 && s.lteBand != prevLte) out += BandChange(s.time, "LTE", prevLte, s.lteBand)
         prevNr = s.nrBand
         prevLte = s.lteBand
     }
     return out
 }
 
+/** Fixed chart ranges for "Fixed scale" (HINT Control #127). */
+internal val Metric.chartRange: ClosedFloatingPointRange<Float>
+    get() = when (this) {
+        Metric.RSRP -> -130f..-50f
+        Metric.SINR -> -10f..35f
+        Metric.RSRQ -> -25f..0f
+        Metric.RSSI -> -110f..-30f
+    }
+
 @Composable
-private fun CellTab(ui: SignalUi, onLoad: () -> Unit, onLogin: (String, Boolean) -> Unit) {
+private fun CellTab(ui: SignalUi, onLoad: () -> Unit, onLogin: (String, Boolean) -> Unit, onTowerName: (String, String) -> Unit) {
     val cell = ui.cell
     when {
         cell.needsLogin && cell.data == null -> LoginPrompt(busy = ui.loginBusy || ui.access is Access.LoggingIn, error = ui.loginError, onLogin = onLogin)
         cell.data == null && cell.error != null -> ErrorBox(cell.error, onRetry = onLoad)
         cell.data == null -> LoadingBox(text = "Reading cell details…")
-        else -> CellDetails(cell.data, onLoad)
+        else -> CellDetails(cell.data, onLoad, ui.towerNames, onTowerName)
     }
 }
 
 @Composable
-private fun CellDetails(root: CellDataRoot, onRefresh: () -> Unit) {
+private fun CellDetails(root: CellDataRoot, onRefresh: () -> Unit, towerNames: Map<String, String>, onTowerName: (String, String) -> Unit) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val c = root.cell
@@ -389,8 +416,8 @@ private fun CellDetails(root: CellDataRoot, onRefresh: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = 720.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            c?.fiveG?.let { AdvancedCard("5G cell", it, nr = true) }
-            c?.fourG?.let { AdvancedCard("LTE cell", it, nr = false) }
+            c?.fiveG?.let { AdvancedCard("5G cell", it, nr = true, towerNames, onTowerName) }
+            c?.fourG?.let { AdvancedCard("LTE cell", it, nr = false, towerNames, onTowerName) }
             if (c?.fiveG == null && c?.fourG == null) Text("The gateway reports no cell details.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             c?.generic?.let { g ->
                 SectionCard("Network", null) {
@@ -424,7 +451,7 @@ private fun CellDetails(root: CellDataRoot, onRefresh: () -> Unit) {
 }
 
 @Composable
-private fun AdvancedCard(title: String, a: BaseAdvancedData, nr: Boolean) {
+private fun AdvancedCard(title: String, a: BaseAdvancedData, nr: Boolean, towerNames: Map<String, String>, onTowerName: (String, String) -> Unit) {
     SectionCard(title, null, trailing = { QualityPill(SignalQuality.overall(a.sector)) }) {
         BandPills(a.sector?.bands, nr)
         Spacer(Modifier.height(8.dp))
@@ -434,6 +461,17 @@ private fun AdvancedCard(title: String, a: BaseAdvancedData, nr: Boolean) {
         InfoRow("CQI", a.cqi?.toString())
         val enb = a.sector?.nbid?.takeIf { it > 0 } ?: if (!nr) CellMath.lteFromEcgi(a.ecgi, a.mcc, a.mnc)?.first else null
         InfoRow(if (nr) "gNB ID" else "eNB ID", enb?.toString(), copyable = true)
+        enb?.let { towerKey(nr, it) }?.let { key ->
+            var editing by remember { mutableStateOf(false) }
+            InfoRow("Tower name", towerNames[key], trailing = {
+                IconButton(onClick = { editing = true }, modifier = Modifier.size(36.dp)) {
+                    Icon(Icons.Outlined.Edit, "Name this tower", modifier = Modifier.size(18.dp))
+                }
+            })
+            if (editing) {
+                TowerNameDialog(towerNames[key].orEmpty(), onDismiss = { editing = false }, onSave = { onTowerName(key, it); editing = false })
+            }
+        }
         InfoRow("Cell / sector", a.sector?.cid?.toString() ?: if (!nr) CellMath.lteFromEcgi(a.ecgi, a.mcc, a.mnc)?.second?.toString() else null)
         InfoRow("TAC", a.tac)
         InfoRow(if (nr) "NCGI" else "ECGI", a.ecgi, mono = true, copyable = true)
@@ -467,3 +505,17 @@ private fun towerText(root: CellDataRoot): String = buildString {
         appendLine("LTE ${a.sector?.bands.orEmpty().joinToString("+")} PCI ${a.pci ?: "?"} EARFCN ${a.earfcn ?: "?"} eNB ${enb ?: "?"} TAC ${a.tac ?: "?"} ECGI ${a.ecgi ?: "?"}")
     }
 }.trim()
+
+@Composable
+private fun TowerNameDialog(current: String, onDismiss: () -> Unit, onSave: (String) -> Unit) {
+    var text by remember { mutableStateOf(current) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Name this tower") },
+        text = {
+            OutlinedTextField(text, { text = it.take(40) }, label = { Text("Name") }, placeholder = { Text("e.g. Water tower") }, singleLine = true)
+        },
+        confirmButton = { TextButton(onClick = { onSave(text) }) { Text("Save") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
+}

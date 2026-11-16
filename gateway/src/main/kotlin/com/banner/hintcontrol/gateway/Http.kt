@@ -25,6 +25,9 @@ object GatewayHttp {
     const val DEFAULT_TIMEOUT_MS = 20_000L
     const val PROBE_TIMEOUT_MS = 5_000L
 
+    /** Second, slower detection pass: some gateways take 10+ s to answer at first (HINT Control #122). */
+    const val SLOW_PROBE_TIMEOUT_MS = 20_000L
+
     fun newClient(timeoutMs: Long = DEFAULT_TIMEOUT_MS): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(timeoutMs.coerceAtMost(10_000L), TimeUnit.MILLISECONDS)
         .readTimeout(timeoutMs, TimeUnit.MILLISECONDS)

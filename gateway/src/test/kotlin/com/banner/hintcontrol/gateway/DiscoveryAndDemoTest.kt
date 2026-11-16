@@ -12,6 +12,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class DiscoveryAndDemoTest {
     private fun server(handler: (String) -> MockResponse) = MockWebServer().apply {
@@ -51,6 +52,26 @@ class DiscoveryAndDemoTest {
             val found = GatewayDiscovery.detect(listOf("${s.hostName}:${s.port}"))
             assertEquals(GatewayKind.Nokia, found.kind)
             assertEquals("Nokia 5G21", found.model)
+        } finally {
+            s.shutdown()
+        }
+    }
+
+    @Test
+    fun `slow gateway is found with the longer timeout`() = runTest {
+        // HINT Control #122: a gateway that takes a while to answer must not end up "not found".
+        val s = server { path ->
+            if (path == "/TMI/v1/gateway/?get=all") MockResponse().setBody(fixture("tmi_gateway.json")).setHeadersDelay(700, TimeUnit.MILLISECONDS)
+            else MockResponse().setResponseCode(404)
+        }
+        val host = "${s.hostName}:${s.port}"
+        try {
+            try {
+                GatewayDiscovery.detect(listOf(host), timeoutMs = 200)
+                fail("expected NoGatewayFound with a short timeout")
+            } catch (_: GatewayException.NoGatewayFound) {
+            }
+            assertEquals(GatewayKind.Tmi, GatewayDiscovery.detect(listOf(host), timeoutMs = 5_000).kind)
         } finally {
             s.shutdown()
         }

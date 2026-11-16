@@ -6,8 +6,14 @@ sealed class GatewayException(message: String, cause: Throwable? = null) : Excep
         GatewayException("Can't reach the gateway at $host", cause)
 
     /** Wrong username or password, or the session could not be renewed. */
-    class Unauthorized(message: String = "The gateway rejected the username or password") :
-        GatewayException(message)
+    class Unauthorized(message: String = REJECTED) : GatewayException(message) {
+        /** True when a login attempt was refused (not "log in first" / an expired session). */
+        val passwordRejected: Boolean get() = message == REJECTED
+
+        companion object {
+            const val REJECTED = "The gateway rejected the username or password"
+        }
+    }
 
     /** The gateway locked logins after too many attempts. */
     class TooManyAttempts(message: String) : GatewayException(message)

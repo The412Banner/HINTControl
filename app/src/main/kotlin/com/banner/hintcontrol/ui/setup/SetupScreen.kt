@@ -59,6 +59,8 @@ import com.banner.hintcontrol.data.userMessage
 import com.banner.hintcontrol.gateway.DetectedGateway
 import com.banner.hintcontrol.gateway.GatewayAddress
 import com.banner.hintcontrol.gateway.GatewayDiscovery
+import com.banner.hintcontrol.gateway.GatewayException
+import com.banner.hintcontrol.gateway.GatewayHttp
 import com.banner.hintcontrol.gateway.GatewayKind
 import com.banner.hintcontrol.ui.components.PasswordField
 import com.banner.hintcontrol.ui.nav.containerViewModel
@@ -73,13 +75,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
 sealed interface SetupStep {
-    data object Detecting : SetupStep
+    /** [slow] = second pass with a longer wait, for gateways that answer slowly. */
+    data class Detecting(val slow: Boolean = false) : SetupStep
     data class NotFound(val message: String) : SetupStep
     data class Found(val gateway: DetectedGateway) : SetupStep
 }
 
 data class SetupUi(
-    val step: SetupStep = SetupStep.Detecting,
+    val step: SetupStep = SetupStep.Detecting(),
     val host: String = GatewayAddress.DEFAULT_HOST,
     val connecting: Boolean = false,
     val loginError: String? = null,
@@ -99,7 +102,7 @@ class SetupViewModel(private val c: AppContainer) : ViewModel() {
     fun detect(manualHost: String?) {
         job?.cancel()
         job = viewModelScope.launch {
-            _ui.update { it.copy(step = SetupStep.Detecting, loginError = null) }
+            _ui.update { it.copy(step = SetupStep.Detecting(), loginError = null) }
             val hosts = buildList {
                 manualHost?.takeIf { it.isNotBlank() }?.let { add(it) }
                 if (manualHost == null) {
@@ -108,7 +111,12 @@ class SetupViewModel(private val c: AppContainer) : ViewModel() {
                 }
             }
             try {
-                val found = GatewayDiscovery.detect(hosts)
+                val found = try {
+                    GatewayDiscovery.detect(hosts)
+                } catch (_: GatewayException.NoGatewayFound) {
+                    _ui.update { it.copy(step = SetupStep.Detecting(slow = true)) }
+                    GatewayDiscovery.detect(hosts, timeoutMs = GatewayHttp.SLOW_PROBE_TIMEOUT_MS)
+                }
                 _ui.update { it.copy(step = SetupStep.Found(found), host = found.host) }
             } catch (e: CancellationException) {
                 throw e
@@ -206,10 +214,14 @@ fun SetupContent(
                 Spacer(Modifier.height(24.dp))
                 AnimatedContent(ui.step, label = "setup", contentKey = { it::class }) { step ->
                     when (step) {
-                        SetupStep.Detecting -> Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp)) {
+                        is SetupStep.Detecting -> Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp)) {
                             CircularProgressIndicator()
                             Spacer(Modifier.height(16.dp))
-                            Text("Looking for your gateway…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                if (step.slow) "Still looking. Some gateways take a while to answer…" else "Looking for your gateway…",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
                         }
                         is SetupStep.NotFound -> NotFoundCard(step.message, ui.host, onHostChange, onDetect)
                         is SetupStep.Found -> LoginCard(step.gateway, ui.connecting, ui.loginError, onConnect, onDetect)
