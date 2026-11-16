@@ -1,5 +1,6 @@
 package com.banner.hintcontrol.data
 
+import android.util.Log
 import com.banner.hintcontrol.gateway.model.MainData
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -85,8 +86,10 @@ class StatusRepository(
             val now = System.currentTimeMillis()
             _state.value = LiveState(profile.id, main, now, null, false)
             val s = settings.settings.value
-            history.observe(profile.id, main, record = s.recordHistory, minIntervalMs = FOREGROUND_RECORD_MS, now = now)
-            summaries.save(main.toSummary(profile.name, now))
+            // History and widget data are extras; a problem there must not look like a gateway error.
+            runCatching { history.observe(profile.id, main, record = s.recordHistory, minIntervalMs = FOREGROUND_RECORD_MS, now = now) }
+                .onFailure { Log.w(TAG, "history: ${it.javaClass.simpleName}: ${it.message}") }
+            runCatching { summaries.save(main.toSummary(profile.name, now)) }
             if (now - lastSummaryPush > 60_000) {
                 lastSummaryPush = now
                 onSummary()
@@ -100,6 +103,8 @@ class StatusRepository(
     }
 
     companion object {
+        private const val TAG = "StatusRepository"
+
         /** While the app is open, store at most one history sample per 30 s. */
         const val FOREGROUND_RECORD_MS = 30_000L
     }

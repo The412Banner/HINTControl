@@ -38,6 +38,10 @@ class ContainerTest {
 
             val live = withTimeout(15_000) { c.status.state.first { it.main != null } }
             assertNotNull(live.main?.signal?.fiveG?.rsrp)
+            val obs = c.history.observe(profile.id, live.main!!, record = true, minIntervalMs = 0)
+            assertEquals(live.main?.signal?.fiveG?.rsrp, obs.sample.nrRsrp)
+            val stored = c.history.samplesOnce(profile.id, 0)
+            assertTrue("rows=${stored.size} pollerError=${c.status.state.value.error}", stored.isNotEmpty())
             assertTrue(withTimeout(10_000) { c.history.sampleCount(profile.id).first { it > 0 } } > 0)
             assertNotNull(c.summaries.load()?.nrRsrp)
 
