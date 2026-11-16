@@ -14,12 +14,13 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
-## 2026-11-16 ~05:40 EST — Rename to "Hint Plus" + v1.0.0-pre4 (feat/android-compose, release CI running)
+## 2026-11-16 ~05:40 EST — Rename to "Hint Plus" + v1.0.0-pre4 (feat/android-compose, pre4 published)
 **Why:** user: "rename the app to Hint Plus" (also confirmed "updater worked" for pre2 → pre3, verified on the FIT).
 **Built:** 3b2aec9c — launcher label (app_name), About card, shared report header, update-check User-Agent (HintPlus/<ver>), README/PRIVACY titles, CI APK name HintPlus-v<ver>-<sha8>.apk + artifact HintPlus-apk, release title. Kept on purpose: application ID com.banner.hintcontrol (changing it = a separate app, no in-place update, data lost) and the GitHub repo name (installed copies look for updates there). Upstream HINT Control credits unchanged. CI 43850365825 running.
 **CI:** 43850365825 green (aapt2 application-label 'Hint Plus', APK HintPlus-v1.0.0-pre3-3b2aec9c.apk, artifact HintPlus-apk).
 **User:** "publish it as pre4 when it's green" → release commit ce039e6ff5afaa21f98a23a40e96b2f605c3bb27 (vc 4, 1.0.0-pre4, release-notes/v1.0.0-pre4.md), CI 43851228361 running.
-**Resume point:** green → verify APK (vc 4, label Hint Plus, v1/v2/v3) → `gh release create v1.0.0-pre4 --target ce039e6ff5afaa21f98a23a40e96b2f605c3bb27 --prerelease` with HintPlus-v1.0.0-pre4-ce039e6f.apk + .sha256 → verify.
+**Published 05:47 EST:** https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0-pre4 — CI 43851228361 green; tag → ce039e6ff5afaa21f98a23a40e96b2f605c3bb27; prerelease (no Latest: API 404); HintPlus-v1.0.0-pre4-ce039e6f.apk (vc 4, 1.0.0-pre4, label 'Hint Plus', v1/v2/v3, cert a40da80a) sha256 57b8724c004e6e8da702644f4c599ba733734a4cb01c70f92b09d62aab0c8d7f + .sha256; re-download matches; notes == file except final newline.
+**Resume point:** FIT runs pre3; pre4 offered by the in-app updater (not installed by me). Merge to main / stable only on the user's word.
 
 ## 2026-11-16 ~05:20–05:35 EST — v1.0.0-pre3 (feat/android-compose, published; user-updated on the FIT)
 **Why:** user: "yes put the widget fix in pre3" (widget said "Gateway offline" when the phone is simply away from the gateway's network). Plus the bugs found in the pre1 → pre2 update test.
