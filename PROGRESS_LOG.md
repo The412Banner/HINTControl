@@ -14,6 +14,11 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~05:40 EST — Rename to "Hint Plus" (feat/android-compose, in CI)
+**Why:** user: "rename the app to Hint Plus" (also confirmed "updater worked" for pre2 → pre3, verified on the FIT).
+**Built:** 3b2aec9c — launcher label (app_name), About card, shared report header, update-check User-Agent (HintPlus/<ver>), README/PRIVACY titles, CI APK name HintPlus-v<ver>-<sha8>.apk + artifact HintPlus-apk, release title. Kept on purpose: application ID com.banner.hintcontrol (changing it = a separate app, no in-place update, data lost) and the GitHub repo name (installed copies look for updates there). Upstream HINT Control credits unchanged. CI 43850365825 running.
+**Next:** green → stage APK, ask the user whether to publish as v1.0.0-pre4.
+
 ## 2026-11-16 ~05:20–05:35 EST — v1.0.0-pre3 (feat/android-compose, published; user-updated on the FIT)
 **Why:** user: "yes put the widget fix in pre3" (widget said "Gateway offline" when the phone is simply away from the gateway's network). Plus the bugs found in the pre1 → pre2 update test.
 **Built:** 7b244742 — StatusSummary.away (markOffline(name, host) checks NetworkInfo.onGatewayNetwork; demo excluded), widget "Not on gateway network", tile "Not on its network"; Updates re-checks install permission on resume (LifecycleResumeEffect); MarkdownLite renders > quotes; clearDownloads() at app start; bottom bar keeps the last tab selected on sub-screens; More badge/row also for ReadyToInstall. ContainerTest asserts away true/false. CI 43846422004 running.
