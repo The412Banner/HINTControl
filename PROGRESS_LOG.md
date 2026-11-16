@@ -14,13 +14,14 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
-## 2026-11-16 ~06:00–06:35 EST — First real gateway (feat/android-compose, G5AR device-list fix in CI)
+## 2026-11-16 ~06:00–06:35 EST — First real gateway (feat/android-compose, pre5 published with G5AR device-list fix)
 **Why:** user: "updated to pre4, shows Hint Plus, I am on my T-Mobile gateway now also".
 **pre4 on the FIT (user-updated via the app):** versionCode 4 / 1.0.0-pre4, lastUpdateTime 05:59:20, installed base.apk sha256 57b8724c… == release; launcher shows "Hint Plus" (user).
 **Real gateway, read-only (no login, nothing changed):** phone 192.168.12.x via 192.168.12.1. Raw `GET :8080/TMI/v1/gateway?get=all` → 200, 680 bytes: Arcadyan TMO-G5AR, firmware 1.00.06, 5G SA only (n41, no "4g" object), bars sent as 3.0. The app's own gateway code (local probe test, not committed): GatewayDiscovery.detect → Tmi at 192.168.12.1; mainData parsed (model, fw, n41, RSRP -101, RSRQ -10, SINR 7, RSSI -89, gNB/cell, uptime); score 44 "Poor" (RSRP < -100); cell details + devices → Unauthorized "Log in to the gateway first" (expected without the admin password). Private values (serial, MAC, cell IDs) kept out of the repo and memory.
 **06:30 user: "logged in"** — app DB (read-only copy, deleted after): the real gateway's profile records live samples every ~30 s (06:29–06:30: n41, RSRP -94/-95, SINR 10); no crash/errors in logcat.
 **User: "I don't see devices connected though"** → cause: G5AR/G5SE firmware lists Wi-Fi clients in `clients.wifi`, which neither the old app nor ours read (HINT Control issue #123, open; found by cmarker84, G5SE confirmed by fitzmorrispr). Fix b8f7addb: ClientsData.wifi → ClientLink.Wireless + test `G5AR lists Wi-Fi clients under wifi` (37/37 gateway tests locally). CI 43858813127.
-**User:** "publish it as pre5 when it's green" → fix CI 43858813127 green → release commit d03c41d568489017a058af2a07866a0b3aa21619 (vc 5, 1.0.0-pre5, release-notes/v1.0.0-pre5.md), CI 43859661645 running. Resume: green → verify → `gh release create v1.0.0-pre5 --target d03c41d5… --prerelease` → verify.
+**User:** "publish it as pre5 when it's green" → fix CI 43858813127 green → release commit d03c41d568489017a058af2a07866a0b3aa21619 (vc 5, 1.0.0-pre5, release-notes/v1.0.0-pre5.md), CI 43859661645 running. **Published 06:45 EST:** https://github.com/The412Banner/HINTControl/releases/tag/v1.0.0-pre5 — CI 43859661645 green; tag → d03c41d568489017a058af2a07866a0b3aa21619; prerelease (no Latest: 404); HintPlus-v1.0.0-pre5-d03c41d5.apk (vc 5, label Hint Plus, v1/v2/v3, cert a40da80a) sha256 25bf413242b6b9dda8e8c25963fa4fca8b3d1bd8dbda9aaf795dd33d3d064fdf + .sha256; re-download matches; notes == file except final newline.
+**Resume point:** user updates to pre5 via the app and checks Devices on the real G5AR (fix not yet proven on hardware).
 **Also seen:** demo gateway logs a false "RebootDetected" after each app update (its uptime restarts with the app process) — demo-only, to fix later.
 
 ## 2026-11-16 ~05:40 EST — Rename to "Hint Plus" + v1.0.0-pre4 (feat/android-compose, pre4 published)
