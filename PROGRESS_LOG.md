@@ -22,6 +22,7 @@ Newest entry first. Times are US Eastern.
 **1.1.2 additions:** 9a036697 (version bump) CI 43896063587 GREEN; then user: "yes add the Auto Blocker tip to both" → 0a877367: README Download section + Updates screen tip on Samsung (install permission missing, or UpdateState.Failed.atInstall), release notes, screenshot 22; CI 43897312181 running.
 **T-Life:** user installed + logged in on the FIT (~10:45). Next: user blocks/schedules a SPARE device (not the FIT) in T-Life, then reads `profile/schedules` via Hint Plus More → Settings → Advanced → Developer options → More → API explorer (or I take the screen with their go). MACs stay out of repo/memory.
 **User decision ~10:50:** "I'm not worried about block schedule testing" → schedule test dropped; #82 parked (format known from T-Life code only, unproven on the G5AR; nothing built).
+**~10:55 user: manual firmware update "a good feature for users that are more advanced"** → recon: the G5AR's own web page has a firmware screen (/update-gateway, shown when logged in) = POST /TMI/v1/gateway/upgrade with the raw file (Bearer, application/octet-stream); 200 = accepted. Plan proposed, awaiting go; not started.
 **Resume point:** CI 43897312181 (0a877367) → green: backup ref, FF main, release v1.1.2 (target = 0a877367 full SHA).
 
 ## 2026-11-16 ~10:20 EST — 1.1.2 (feat/release-1.1.2, in CI)
