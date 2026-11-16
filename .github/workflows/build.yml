@@ -46,6 +46,25 @@ jobs:
       - name: Gateway unit tests
         run: ./gradlew --no-daemon :gateway:test
 
+      - name: Restore Robolectric Android runtime
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-android-all-instrumented-15-robolectric-13954326-i7
+
+      - name: Fetch Robolectric Android runtime (with retries)
+        run: |
+          set -e
+          V=15-robolectric-13954326-i7
+          DIR="$HOME/.m2/repository/org/robolectric/android-all-instrumented/$V"
+          BASE="https://repo1.maven.org/maven2/org/robolectric/android-all-instrumented/$V"
+          mkdir -p "$DIR"
+          for f in "android-all-instrumented-$V.jar" "android-all-instrumented-$V.pom"; do
+            [ -s "$DIR/$f" ] || curl -fsSL --retry 6 --retry-delay 20 --retry-all-errors -o "$DIR/$f" "$BASE/$f"
+            [ -s "$DIR/$f.sha512" ] || curl -fsSL --retry 6 --retry-delay 20 --retry-all-errors -o "$DIR/$f.sha512" "$BASE/$f.sha512" || true
+          done
+          ls -la "$DIR"
+
       - name: App unit tests
         run: ./gradlew --no-daemon :app:testDebugUnitTest --tests 'com.banner.hintcontrol.LogicTest' --tests 'com.banner.hintcontrol.ContainerTest'
 
