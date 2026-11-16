@@ -39,7 +39,7 @@ object Report {
             s.imei?.let { appendLine("IMEI: ${mask(it)}") }
         }
         appendLine()
-        append("Banners HINT Control ${BuildConfig.VERSION_NAME}")
+        append("Hint Plus ${BuildConfig.VERSION_NAME}")
     }
 
     private fun StringBuilder.section(title: String, sector: BaseCellData?, adv: BaseAdvancedData?, nr: Boolean) {

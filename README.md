@@ -1,4 +1,4 @@
-# Banners HINT Control
+# Hint Plus
 
 An Android app to view and control **T-Mobile Home Internet** gateways, rebuilt from the ground up in Jetpack Compose.
 

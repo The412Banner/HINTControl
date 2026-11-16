@@ -93,7 +93,7 @@ jobs:
           set -e
           VER=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
           SHA=${GITHUB_SHA::8}
-          NAME="HINTControl-v${VER}-${SHA}.apk"
+          NAME="HintPlus-v${VER}-${SHA}.apk"
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release-signed.apk "dist/$NAME"
           (cd dist && sha256sum "$NAME" > "$NAME.sha256" && cat "$NAME.sha256")
@@ -102,7 +102,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: HINTControl-apk
+          name: HintPlus-apk
           path: dist/
           retention-days: 30
 
@@ -133,5 +133,5 @@ jobs:
           if [ "${{ inputs.prerelease }}" = "true" ]; then FLAGS="--prerelease"; fi
           gh release create "${{ inputs.tag }}" dist/* \
             --target "$GITHUB_SHA" \
-            --title "Banners HINT Control ${{ inputs.tag }}" \
+            --title "Hint Plus ${{ inputs.tag }}" \
             --notes-file "$NOTES" $FLAGS

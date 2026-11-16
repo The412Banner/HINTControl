@@ -113,7 +113,7 @@ class UpdateRepository(
         val request = Request.Builder()
             .url("https://api.github.com/repos/$repo/releases?per_page=20")
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "BannersHINTControl/$installed")
+            .header("User-Agent", "HintPlus/$installed")
             .build()
         val r = http.await(request)
         if (!r.isSuccess) throw IllegalStateException("GitHub answered HTTP ${r.code}")
@@ -127,7 +127,7 @@ class UpdateRepository(
             dir.listFiles()?.forEach { it.delete() }
             val file = File(dir, release.apk.name)
             withContext(Dispatchers.IO) {
-                val request = Request.Builder().url(release.apk.url).header("User-Agent", "BannersHINTControl/$installed").build()
+                val request = Request.Builder().url(release.apk.url).header("User-Agent", "HintPlus/$installed").build()
                 http.newBuilder().readTimeout(60, java.util.concurrent.TimeUnit.SECONDS).callTimeout(0, java.util.concurrent.TimeUnit.SECONDS).build().newCall(request).execute().use { response ->
                     if (!response.isSuccessful) throw IllegalStateException("Download failed (HTTP ${response.code})")
                     val body = response.body ?: throw IllegalStateException("Empty download")
@@ -163,7 +163,7 @@ class UpdateRepository(
 
     private suspend fun verify(release: AppRelease, file: File) {
         release.checksum?.let { asset ->
-            val r = http.await(Request.Builder().url(asset.url).header("User-Agent", "BannersHINTControl/$installed").build())
+            val r = http.await(Request.Builder().url(asset.url).header("User-Agent", "HintPlus/$installed").build())
             if (!r.isSuccess) throw IllegalStateException("Couldn't read the checksum file (HTTP ${r.code})")
             val expected = r.body.trim().split(Regex("\\s+")).firstOrNull()?.lowercase()
             val actual = withContext(Dispatchers.IO) { sha256(file) }

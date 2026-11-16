@@ -55,13 +55,13 @@ class LogicTest {
             tag = tag,
             prerelease = pre,
             draft = draft,
-            assets = if (apk) listOf(GhAsset("HINTControl-$tag.apk", "https://x/$tag.apk", 1), GhAsset("HINTControl-$tag.apk.sha256", "https://x/$tag.sha", 1)) else emptyList(),
+            assets = if (apk) listOf(GhAsset("HintPlus-$tag.apk", "https://x/$tag.apk", 1), GhAsset("HintPlus-$tag.apk.sha256", "https://x/$tag.sha", 1)) else emptyList(),
         )
         val list = listOf(rel("v1.0.0", false), rel("v1.1.0-pre1", true), rel("v1.2.0", false, apk = false), rel("v2.0.0", false, draft = true))
         assertEquals("v1.0.0", UpdateRepository.pick(list, includePrereleases = false)?.tag)
         val pre = UpdateRepository.pick(list, includePrereleases = true)!!
         assertEquals("v1.1.0-pre1", pre.tag)
-        assertEquals("HINTControl-v1.1.0-pre1.apk.sha256", pre.checksum?.name)
+        assertEquals("HintPlus-v1.1.0-pre1.apk.sha256", pre.checksum?.name)
     }
 
     @Test

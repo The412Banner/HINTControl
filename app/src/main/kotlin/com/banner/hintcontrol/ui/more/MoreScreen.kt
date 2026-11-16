@@ -208,7 +208,7 @@ fun AboutScreen() {
     fun open(url: String) = runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
     SubScreen("About", actions.back) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionCard("Banners HINT Control", Icons.Outlined.Info) {
+            SectionCard("Hint Plus", Icons.Outlined.Info) {
                 Text("Version ${BuildConfig.VERSION_NAME} · build ${BuildConfig.GIT_SHA}", style = MaterialTheme.typography.bodyMedium)
                 Spacer(Modifier.height(6.dp))
                 Text(

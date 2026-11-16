@@ -1,6 +1,6 @@
-# Privacy Policy — Banners HINT Control
+# Privacy Policy — Hint Plus
 
-Banners HINT Control collects no personal information and has no analytics or crash-reporting service.
+Hint Plus collects no personal information and has no analytics or crash-reporting service.
 
 ## What the app talks to
 - **Your gateway**, on your local network, to read status and change settings you ask it to change.

@@ -214,11 +214,11 @@ class ScreenshotTest {
         val release = AppRelease(
             tag = "v1.0.0-pre2",
             version = AppVersion.parse("1.0.0-pre2")!!,
-            title = "Banners HINT Control v1.0.0-pre2",
+            title = "Hint Plus v1.0.0-pre2",
             notes = "## What's new\n- **Placement mode** beeps faster near a better spot\n- Fixed the 6 GHz settings overwriting 5 GHz\n\nSee `CHANGELOG` for details.",
             publishedAt = "2026-11-16T12:00:00Z",
             pageUrl = "https://github.com/The412Banner/HINTControl/releases",
-            apk = GhAsset("HINTControl-v1.0.0-pre2.apk", "https://x", 9_400_000),
+            apk = GhAsset("HintPlus-v1.0.0-pre2.apk", "https://x", 9_400_000),
             checksum = null,
             prerelease = true,
         )

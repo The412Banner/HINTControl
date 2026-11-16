@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Banners HINT</string>
+    <string name="app_name">Hint Plus</string>
     <string name="widget_name">Gateway signal</string>
     <string name="widget_description">5G and LTE signal from your gateway</string>
     <string name="tile_name">Gateway signal</string>
