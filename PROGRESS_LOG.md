@@ -23,7 +23,8 @@ Newest entry first. Times are US Eastern.
 - `network/configuration/v2?get=ap` → 200: `2.4ghz`/`5.0ghz`/`6.0ghz` each ONLY `{isRadioEnabled}`; `ssids[]` with 2.4/5.0/6.0ghzSsid, encryptionMode, encryptionVersion, guest, isBroadcastEnabled, ssidName, wpaKey; **no bandSteering, no channel/width/power** → #120 fix (8816390d) matches; #133 can't apply to the G5AR (no band steering field).
 - `profile/schedules` → 200 `{"schedules": []}` (exists, empty); `profile`, `profiles`, `profile/devices` → 404 "The requested method does not exist" → #82: the schedule format is unknown until one exists (e.g. created in T-Life).
 - `network/telemetry/?get=cell` → 5g: cqi, ecgi, sector {antennaUsed ("Internal_omni"), bands, bars, cid, gNBID, rsrp, rsrq, rssi, sinr} + generic + gps; **no bandwidth, earfcn, pci, tac, mcc/mnc/plmn** → hide empty rows; new: show antennaUsed.
-**Resume point:** code: hide empty Cell rows + show antenna; then ask user: (a) release as 1.1.1, (b) #82 needs a schedule made in T-Life to learn the format.
+**Built 8eab008a** (CI 43888801226): Cell tab rows only when reported; new "Antenna" row (antennaUsed, "Internal_omni" → "Internal omni"); demo data has it; LogicTest antennaText; gateway tests 42/42.
+**Resume point:** green → ask user: (a) release as 1.1.1 (8816390d + 8eab008a), (b) #82 needs a schedule created in T-Life to learn the format (then read profile/schedules again).
 
 ## 2026-11-16 ~08:20–08:45 EST — 1.1.0: built-in speed test (main, released)
 **Why:** user: "updated to 1.0.1, works, can we add a simple speed test to the app, like ookla or something?" → options given (Ookla has no free API for other apps; M-Lab publishes testers' IPs) → user: "yes do it" for: Cloudflare-based test (speed.cloudflare.com, reference code MIT, endpoints checked 200) + "Open Speedtest by Ookla" button, release as 1.1.0 when green.
