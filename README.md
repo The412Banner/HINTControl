@@ -45,11 +45,11 @@ Compared with HINT Control:
 - **More from signal history**: band changes marked on the chart and listed, an optional fixed chart scale, and CSV export
 - **Cell details**: the eNB and sector worked out from the LTE cell ID when the gateway doesn't report them, and your own names for cell towers
 - **Device names**: give devices your own names, see when they first appeared, and spot new devices and private (randomised) MAC addresses
-- **Review before saving**: every Wi-Fi change is listed for you to check before it's sent, on top of HINT Control's warnings
+- **Review before saving**: every Wi-Fi change is listed for you to check before it's sent, on top of HINT Control's warnings, and afterwards Hint Plus checks which changes the gateway actually kept
 - **Share Wi-Fi as a QR code**
 - **Speed test**: download, upload, ping and jitter (using Cloudflare's speed test servers), saved with your gateway's signal at the time so you can compare spots and bands; plus a shortcut to Speedtest by Ookla
 - **Scheduled reboots** on chosen days and times
-- **Alerts**: notifications when the gateway goes offline (only while you're on its network), restarts, has a weak signal or a new device joins, plus an event log
+- **Alerts**: notifications when the gateway goes offline (only while you're on its network), restarts, has a weak signal, gets a firmware update or a new device joins, plus an event log
 - **Quick Settings tile and app shortcuts**
 - **Several gateways**, each with its own saved login
 - **Demo gateway** that shows every screen without hardware
