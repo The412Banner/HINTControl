@@ -68,6 +68,9 @@ android {
                 it.systemProperty("roborazzi.test.record", "true")
                 it.systemProperty("robolectric.pixelCopyRenderMode", "hardware")
                 it.maxHeapSize = "3g"
+                // A hung test fails the task with its name instead of using up the job's hour.
+                it.timeout.set(java.time.Duration.ofMinutes(25))
+                it.testLogging { events("started", "failed") }
             }
         }
     }

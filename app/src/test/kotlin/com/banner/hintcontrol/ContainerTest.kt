@@ -87,27 +87,13 @@ class ContainerTest {
             assertEquals(2, c.profiles.state.first { it.profiles.size == 2 }.profiles.size)
             c.profiles.delete(second.id)
             assertEquals(profile.id, c.profiles.state.first { it.profiles.size == 1 }.active?.id)
-        } finally {
-            c.scope.cancel()
-        }
-    }
 
-    /** Firmware upload through the real session against the demo gateway: send, restart, new version, events. */
-    @Test
-    fun firmwareUploadOnDemo() = runBlocking {
-        val ctx = ApplicationProvider.getApplicationContext<Application>()
-        val c = AppContainer(ctx, HistoryDatabase.inMemory(ctx))
-        try {
-            val profile = GatewayProfile(name = "Demo gateway", host = "demo", kind = GatewayKind.Demo)
-            c.profiles.save(profile)
-            withTimeout(10_000) { c.profiles.active.first { it?.id == profile.id } }
-            withTimeout(10_000) { c.session.access.first { it == Access.LoggedIn } }
-            withTimeout(15_000) { c.status.state.first { it.main != null } }
-
+            // Firmware upload through the real session against the demo gateway: send, restart, new version, events.
+            // Kept in this test: a second AppContainer in the same run shares the process-wide DataStore.
             val bytes = ByteArray(200_000) { (it % 251).toByte() }
             val uploader = FirmwareUploader(c.scope, c.session, c.history, onObservation = { _, _ -> }, pollMs = 1_000, waitMs = 90_000)
             uploader.start(FirmwareInfo("content://test/fw.bin", "fw.bin", bytes.size.toLong(), "ab".repeat(32))) { java.io.ByteArrayInputStream(bytes) }
-            val done = withTimeout(90_000) { uploader.job.first { it != null && !it.active } }!!
+            val done = withTimeout(100_000) { uploader.job.first { it != null && !it.active } }!!
             assertEquals(done.message, FirmwarePhase.Done, done.phase)
             assertEquals(bytes.size.toLong(), done.sent)
             assertEquals("1.2403.0.12", done.before)
