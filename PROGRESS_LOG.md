@@ -16,6 +16,11 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~10:20 EST — 1.1.2 (feat/release-1.1.2, in CI)
+**Why:** user: "add all three to 1.1.2 and release when green" — demo restart fix (ca0c513), "did the Wi-Fi change stick" check (Reddit report: G5AR channel "reverts to Auto"), firmware change tracking (user asked whether the API can update firmware: no known endpoint; gateways get firmware from the carrier → track it instead).
+**Built ef30193 (CI 43894738117):** WifiViewModel re-reads the settings after saving (3 × 3 s retries) → WifiChanges.notKept(readBack, sent) (positional) → dialog "Not all changes stuck" + event log detail; HistoryRepository FirmwareMemory (SharedPreferences "firmware") → Observation.firmwareChanged + EventType.FirmwareUpdated; AppContainer.notifyFirmware (ID_FIRMWARE, AppSettings.alertFirmware, Alerts toggle) from StatusRepository.onObservation and MonitorWorker. Tests: LogicTest `changes the gateway did not keep`, ContainerTest firmware tracking; gateway tests locally.
+**Resume point:** green → vc 10 / 1.1.2 + release-notes/v1.1.2.md → CI → backup ref → FF main → release v1.1.2 Latest; delete fix/demo-reboot (backup first, chained).
+
 ## 2026-11-16 ~10:15 EST — Demo restart glitch fix + branch tidy (fix/demo-reboot, in CI)
 **Why:** user: "yes fix the demo glitch and tidy the branches".
 **Demo fix ca0c513 (CI 43892933902):** DemoGatewayClient takes a DemoBootTimeStore; the app keeps the demo's boot time in SharedPreferences "demo", so restarting/updating the app no longer looks like a gateway restart; a demo reboot still updates it. Test `demo uptime survives an app restart`; gateway tests 43/43 locally. Not released (waits for the next release).
