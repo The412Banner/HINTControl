@@ -455,10 +455,12 @@ private fun AdvancedCard(title: String, a: BaseAdvancedData, nr: Boolean, towerN
     SectionCard(title, null, trailing = { QualityPill(SignalQuality.overall(a.sector)) }) {
         BandPills(a.sector?.bands, nr)
         Spacer(Modifier.height(8.dp))
+        // Rows a gateway doesn't report are left out (the G5AR has no bandwidth, ARFCN, PCI, TAC or operator).
+        a.sector?.antennaUsed?.let { InfoRow("Antenna", antennaText(it)) }
         a.bandwidth?.let { InfoRow("Bandwidth", it) }
-        InfoRow(if (nr) "NR-ARFCN" else "EARFCN", a.earfcn, copyable = true)
-        InfoRow("PCI", a.pci, copyable = true)
-        InfoRow("CQI", a.cqi?.toString())
+        a.earfcn?.let { InfoRow(if (nr) "NR-ARFCN" else "EARFCN", it, copyable = true) }
+        a.pci?.let { InfoRow("PCI", it, copyable = true) }
+        a.cqi?.let { InfoRow("CQI", it.toString()) }
         val enb = a.sector?.nbid?.takeIf { it > 0 } ?: if (!nr) CellMath.lteFromEcgi(a.ecgi, a.mcc, a.mnc)?.first else null
         InfoRow(if (nr) "gNB ID" else "eNB ID", enb?.toString(), copyable = true)
         enb?.let { towerKey(nr, it) }?.let { key ->
@@ -473,9 +475,10 @@ private fun AdvancedCard(title: String, a: BaseAdvancedData, nr: Boolean, towerN
             }
         }
         InfoRow("Cell / sector", a.sector?.cid?.toString() ?: if (!nr) CellMath.lteFromEcgi(a.ecgi, a.mcc, a.mnc)?.second?.toString() else null)
-        InfoRow("TAC", a.tac)
-        InfoRow(if (nr) "NCGI" else "ECGI", a.ecgi, mono = true, copyable = true)
-        InfoRow("Operator", listOfNotNull(a.plmn, listOfNotNull(a.mcc, a.mnc).takeIf { it.size == 2 }?.joinToString("-")).distinct().joinToString(" · ").ifBlank { null })
+        a.tac?.let { InfoRow("TAC", it) }
+        a.ecgi?.let { InfoRow(if (nr) "NCGI" else "ECGI", it, mono = true, copyable = true) }
+        listOfNotNull(a.plmn, listOfNotNull(a.mcc, a.mnc).takeIf { it.size == 2 }?.joinToString("-")).distinct().joinToString(" · ").ifBlank { null }
+            ?.let { InfoRow("Operator", it) }
         val supported = a.supportedBands.orEmpty()
         if (supported.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
@@ -519,3 +522,7 @@ private fun TowerNameDialog(current: String, onDismiss: () -> Unit, onSave: (Str
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
 }
+
+/** "Internal_omni" → "Internal omni"; gateways report which antenna they use (G5AR). */
+internal fun antennaText(raw: String): String =
+    raw.replace('_', ' ').trim().replaceFirstChar { it.uppercase() }

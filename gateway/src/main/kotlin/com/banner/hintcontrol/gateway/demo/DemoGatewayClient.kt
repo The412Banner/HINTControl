@@ -146,7 +146,7 @@ class DemoGatewayClient(
 
     private fun nr(): CellData5G {
         val rsrp = nrRsrp.roundToInt()
-        return CellData5G(bands = listOf("n41"), bars = bars(rsrp), cid = 281, nbid = 1_402_118, rsrp = rsrp, rsrq = (-11 + (nrSinr - 15) / 4).roundToInt(), rssi = rsrp + 26, sinr = nrSinr.roundToInt())
+        return CellData5G(antennaUsed = "Internal_omni", bands = listOf("n41"), bars = bars(rsrp), cid = 281, nbid = 1_402_118, rsrp = rsrp, rsrq = (-11 + (nrSinr - 15) / 4).roundToInt(), rssi = rsrp + 26, sinr = nrSinr.roundToInt())
     }
 
     private fun lte(): CellDataLTE {

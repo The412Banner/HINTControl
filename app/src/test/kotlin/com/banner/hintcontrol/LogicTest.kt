@@ -35,6 +35,7 @@ class LogicTest {
         val r = com.banner.hintcontrol.data.SpeedRecord(time = 0, nrBand = "n41", nrRsrp = -95, nrSinr = 10)
         assertEquals("5G n41 RSRP -95 SINR 10", r.signalText())
         assertNull(com.banner.hintcontrol.data.SpeedRecord(time = 0).signalText())
+        assertEquals("Internal omni", com.banner.hintcontrol.ui.signal.antennaText("Internal_omni"))
     }
 
     @Test
