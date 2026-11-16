@@ -3,14 +3,19 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- Branch `feat/android-compose` (main = upstream zacharee/HINTControl 1.17.3, untouched).
-- Modules: `gateway/` (plain Kotlin; 36 tests pass locally with JDK 21: `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-arm64 ./gradlew -PgatewayOnly=true :gateway:test`) and `app/` (Android, Compose; CI only — no Android SDK on the device).
-- CI: `.github/workflows/build.yml` runs on push to `feat/**`/`fix/**` (forks can't dispatch workflows that aren't on the default branch). Artifacts: `HINTControl-apk` (testkey v1/v2/v3 APK + .sha256) and `screenshots` (Robolectric renders of every screen with demo data).
-- CI runs: 43810534903 (2886e943) FAILED compile (SectionCard parameter order + Glance import); 43810959412 (6ecb8760) GREEN — all steps, APK signed v1+v2+v3 (cert a40da80a…f5dc), 16 screenshots; 43811713962 (08ac4701) = screenshot-review fixes, running.
-- Next: fix compile errors, review screenshots, stage APK in /sdcard/Download, ask before install, prerelease v1.0.0-pre1 from the tested APK (gh release create by hand, so the released file == the tested file).
+- Branch `feat/android-compose` (main = upstream zacharee/HINTControl 1.17.3, untouched; merge = user's go after device test).
+- Release candidate: **25b021a34c444afd6596f4886144998fdf5ea3d1**, CI run **43814242612** green (gateway 36 tests, LogicTest 7, ContainerTest end-to-end, R8 release APK, apksigner v1+v2+v3 true, cert a40da80a…f5dc, 18 screenshots).
+- APK `HINTControl-v1.0.0-pre1-25b021a3.apk`, 3,329,576 bytes, sha256 `764fed21464e19150ccd85709fa7440deda8883f8a730e2556202a52825557b3`. Staged on the Pocket FIT: `/sdcard/Download/HINTControl-android-compose-25b021a3.apk` (hash host == device). NOT installed (needs the user's yes). Upstream app dev.zwander.arcadyankvd21control is installed on the FIT; ours is a separate package.
+- Next: publish v1.0.0-pre1 PRE-RELEASE with this exact APK (`gh release create --target 25b021a3… --prerelease`), verify, then user test. Stable/Latest only on the user's word.
 
 ## Lessons learned (don't repeat these)
-- (none yet)
+- Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
+- Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
+- On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
+
+## 2026-11-16 ~01:10 EST — Release candidate 25b021a3 (feat/android-compose, CI-green, NOT device-tested)
+**Runs:** 43812310757 (72ff4fbb) failed — Robolectric runtime download HTTP 429 → cache + pre-fetch (dd668919); 43812576886 failed — end-to-end test: no history sample within 10 s; 43812859446 (ba8f953b) green with a split test; root cause: the poller is cancelled when the last screen stops collecting, cutting the history write → side effects moved to the app scope (c05f3885, run 43813505611 green, poller-recorded sample now asserted). Wi-Fi save and admin-login change also moved to the app scope so leaving the screen can't cancel them; warning cleanup (25b021a3, run 43814242612 green).
+**Also:** navigation rail in landscape and on wide screens (Material's default used a bottom bar on short landscape windows, e.g. handhelds); verified in 18-shell-landscape.png.
 
 ## 2026-11-16 — First green build + screenshot review (feat/android-compose, CI-green, NOT device-tested)
 **CI:** 43810959412 on 6ecb8760 green. aapt2: package com.banner.hintcontrol, versionCode 1, versionName 1.0.0-pre1, label "Banners HINT". Gateway tests 36 + LogicTest 7 pass.
