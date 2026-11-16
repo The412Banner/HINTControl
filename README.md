@@ -1,104 +1,122 @@
 # Hint Plus
 
-An Android app to view and control **T-Mobile Home Internet** gateways, rebuilt from the ground up in Jetpack Compose.
+**View and control your T-Mobile Home Internet gateway from Android.** Signal, connected devices, Wi-Fi settings, reboots and more in one app, with a built-in demo so you can look around without a gateway.
 
-Based on [HINT Control](https://github.com/zacharee/HINTControl) by Zachary Wander (MIT). This fork is Android-only and focuses on a cleaner app, more tools and safer defaults. Not made by or affiliated with T-Mobile.
+Hint Plus is an Android-only rewrite of **[HINT Control](https://github.com/zacharee/HINTControl) by Zachary Wander ([@zacharee](https://github.com/zacharee))**, used under the MIT License. The way Hint Plus talks to gateways (the API calls, data formats and many of the safety warnings) comes from his work. Please support the original project.
+
+Hint Plus is not made by, endorsed by or affiliated with T-Mobile.
+
+<p>
+  <img src="docs/screenshots/home.png" width="160" alt="Home">
+  <img src="docs/screenshots/signal.png" width="160" alt="Live signal and placement mode">
+  <img src="docs/screenshots/history.png" width="160" alt="Signal history">
+  <img src="docs/screenshots/devices.png" width="160" alt="Connected devices">
+  <img src="docs/screenshots/wifi.png" width="160" alt="Wi-Fi settings">
+</p>
+
+*Screenshots use the built-in demo gateway.*
+
+## Download
+
+Get the latest APK from **[Releases](https://github.com/The412Banner/HINTControl/releases/latest)**. Android 8.0 or newer.
+
+After that, the app updates itself: it checks this repository's releases, shows what's new, downloads the APK, verifies its SHA-256 checksum and hands it to Android's installer.
 
 ## Supported gateways
 
-| Gateway | API | Status, signal | Devices, Wi-Fi, reboot | Change admin login |
-| --- | --- | --- | --- | --- |
-| Arcadyan KVD21, TMOG4AR | TMI v1 (port 8080) | ✓ (no login needed) | ✓ | ✓ |
-| Sagemcom FAST 5688W | TMI v1 | ✓ | ✓ | ✓ |
-| Sercomm TMOG4SE | TMI v1 | ✓ | ✓ | ✓ |
-| Nokia 5G21 | web CGI | ✓ | ✓ (no add/remove networks) | — |
+| Gateway | Connection | Tested on real hardware |
+| --- | --- | --- |
+| Arcadyan TMO-G5AR | TMI API (port 8080) | ✓ Firmware 1.00.06: detection, login, status, 5G signal, connected devices |
+| Arcadyan KVD21, TMO-G4AR | TMI API | Not yet |
+| Sagemcom FAST 5688W | TMI API | Not yet |
+| Sercomm TMO-G4SE, TMO-G5SE | TMI API | Not yet |
+| Nokia 5G21 | Web interface (CGI) | Not yet |
 
-The gateway communication is ported from HINT Control. It is covered by unit tests against recorded responses, but this fork has **not yet been tested on real gateway hardware**. Reports are welcome.
+Support for these models comes from HINT Control and is covered by automated tests against recorded gateway responses. If you try Hint Plus on a model marked "Not yet", please [open an issue](https://github.com/The412Banner/HINTControl/issues) and say what works.
 
-A built-in **demo gateway** lets you try every screen without one.
+Like any app of this kind, Hint Plus reaches the gateway only while your phone is on the gateway's own network (Wi-Fi or Ethernet). T-Mobile gateways can't be reached from the internet.
 
-## Features
+## What Hint Plus adds
 
-**Home**
-- Signal score (0–100) and quality for 5G and LTE, bands with frequency (e.g. `n41 · 2.5 GHz`)
-- RSRP, SINR, RSRQ and RSSI gauges, signal bars, cell IDs
-- Uptime, network details, connected-device counts and a 30-minute SINR trend
-- Several gateways, each with its own saved login; switch from the title bar
+Compared with HINT Control:
 
-**Signal**
-- Live readings with a rolling chart
-- **Placement mode**: one reading per second, a tone and a buzz that rise with the score, and the best spot remembered. Walk the gateway around the house and stop where it's highest.
-- History from 1 hour to 30 days, drag across a chart to read exact values, min/avg/max, band changes, CSV export
-- Cell details: PCI, EARFCN/NR-ARFCN, CQI, bandwidth, eNB/gNB (eNB worked out from the ECGI when the gateway doesn't report it), TAC, operator, supported bands, and the location the gateway reports
+- **Signal score and ratings**: a 0–100 score, Excellent-to-Poor ratings for RSRP, SINR, RSRQ and RSSI, and bands shown with their frequency (for example `n41 · 2.5 GHz`)
+- **Placement mode**: one reading per second, with a tone and vibration that rise as the signal improves, and the best spot remembered
+- **More from signal history**: band-change tracking and CSV export
+- **Cell details**: the eNB and sector worked out from the LTE cell ID when the gateway doesn't report them
+- **Device names**: give devices your own names, see when they first appeared, and spot new devices and private (randomised) MAC addresses
+- **Review before saving**: every Wi-Fi change is listed for you to check before it's sent, on top of HINT Control's warnings
+- **Share Wi-Fi as a QR code**
+- **Scheduled reboots** on chosen days and times
+- **Alerts**: notifications when the gateway goes offline (only while you're on its network), restarts, has a weak signal or a new device joins, plus an event log
+- **Quick Settings tile and app shortcuts**
+- **Several gateways**, each with its own saved login
+- **Demo gateway** that shows every screen without hardware
 
-**Devices**
-- Search, filter (online, Wi-Fi, wired, new) and sort
-- Give devices your own names, see when they were first seen, spot new ones, and see when a device uses a private (randomised) MAC
+## What's different
 
-**Wi-Fi**
-- Edit network name, password, security, bands, visibility (hide or show the network name) and guest mode
-- Share any network as a QR code
-- Per-band radio switch, channel, width and transmit power; band steering
-- Every change is listed for review before saving, with warnings for risky ones (all radios off, 5 GHz off, renaming the network you're on)
-
-**Gateway tools**
-- Reboot with live progress and measured downtime
-- **Scheduled reboot** (days and time), sent by the phone while it's on the gateway's network
-- Change the admin username and password (TMI gateways)
-- Gateway details with SIM numbers hidden until you tap, and a shareable status report for support
-
-**Alerts and background**
-- Notifications when the gateway goes offline (only while the phone is on its network), restarts, gets a weak signal, or a new device joins
-- Event log of restarts, outages, band changes and saved settings
-- Home-screen widget and Quick Settings tile with live 5G/LTE readings
-- Launcher shortcuts: live signal, devices, reboot
-- Automation: Tasker, MacroDroid, Automate and others can reboot or refresh through a token-protected broadcast
-
-**App**
-- Material You, light/dark, pure black, layouts for phones, tablets and landscape handhelds
-- **In-app updates**: checks this repository's GitHub releases, shows the release notes, downloads the APK, checks its SHA-256 and package name, then hands it to Android's installer. Test builds (pre-releases) can be switched on or off.
-- API explorer (developer options) for raw gateway requests; passwords and tokens are hidden in the output
-- Local crash log you can share; nothing is uploaded
+- **Android only.** HINT Control runs on Android, iOS and desktop. Hint Plus focuses on Android and is built with Jetpack Compose and Material 3, with layouts for phones, tablets and landscape handhelds.
+- **Privacy.** Your gateway password is encrypted with the Android Keystore, and there's no third-party crash reporting; crash details stay on your phone until you choose to share them. See [PRIVACY.md](PRIVACY.md).
+- **Updates.** Updates come from this repository. Each download is checked against its published SHA-256 file, and test builds (pre-releases) can be turned on or off.
+- **Automation.** Instead of a Tasker plugin, Hint Plus accepts simple broadcasts that work with Tasker, MacroDroid and similar apps (the Tasker plugin library is GPL-licensed, which doesn't fit this MIT app).
+- **Separate app.** Hint Plus has its own package name (`com.banner.hintcontrol`), so it can be installed next to HINT Control.
 
 ## Fixed compared with HINT Control 1.17.3
 
+- **G5AR / G5SE: Wi-Fi devices didn't show.** These gateways list Wi-Fi clients in one `wifi` group, which wasn't read, so only wired devices appeared. Found by [cmarker84](https://github.com/cmarker84) and confirmed on a G5SE by [fitzmorrispr](https://github.com/fitzmorrispr) in [HINT Control issue #123](https://github.com/zacharee/HINTControl/issues/123).
 - Changing the 6 GHz channel or width overwrote the 5 GHz settings.
-- Nokia: SIM status always showed "not active"; login sent the stored credentials instead of the typed ones.
-- Gateway GPS position was never read (`latitude`/`longitude` vs `lat`/`lon`).
-- The gateway admin password was stored unencrypted; it is now encrypted with the Android Keystore.
-- Crash reports no longer go to a third-party service.
+- Nokia 5G21: the SIM always showed as inactive, and login used saved credentials instead of the ones you typed.
+- The gateway's reported location was never read.
+- The gateway password was stored unencrypted.
 
-## Install
+## Permissions
 
-Download the APK from [Releases](https://github.com/The412Banner/HINTControl/releases). Builds are signed with the public AOSP test key (v1 + v2 + v3), so every build installs over the previous one. Android 8.0 or newer.
+| Permission | Why |
+| --- | --- |
+| Internet, network state, local network | Talk to the gateway; check for app updates on GitHub |
+| Notifications | Alerts and update notices (you're asked once) |
+| Exact alarms, start at boot, foreground service | Scheduled reboots at the time you set, also after the phone restarts |
+| Install apps | Install updates you choose to download (Android asks you to allow this the first time) |
+| Vibration | Placement mode feedback |
 
-The app uses a different package name (`com.banner.hintcontrol`) from the original, so both can be installed side by side.
+## Automation
 
-## Automation intents
-
-Turn on **More → Automation**, then send a broadcast:
+Turn on **More → Automation**, then send a broadcast from Tasker, MacroDroid or another automation app:
 
 | | |
 | --- | --- |
 | Action | `com.banner.hintcontrol.action.REBOOT` or `com.banner.hintcontrol.action.REFRESH` |
 | Package | `com.banner.hintcontrol` |
-| Extra | `token` = the token shown in the app |
+| Extra | `token`: the token shown in the app |
 
 ## Building
 
-GitHub Actions builds every push to `feat/**` and `fix/**` (`.github/workflows/build.yml`): gateway and app unit tests, release APK, test-key signing with v1/v2/v3 verification, and screenshots of every screen rendered with demo data (Robolectric + Roborazzi).
+GitHub Actions builds every push to `feat/**` and `fix/**` branches ([build.yml](.github/workflows/build.yml)): unit tests, the release APK, signing with the public AOSP test key (v1 + v2 + v3) and screenshots of every screen with demo data.
 
-Locally: `./gradlew :app:assembleRelease` (Android SDK, JDK 17+). The gateway module alone builds without the Android SDK: `./gradlew -PgatewayOnly=true :gateway:test`.
+To build locally you need JDK 17+ and the Android SDK:
 
-Project layout:
-- `gateway/` — plain Kotlin: TMI and Nokia clients, demo gateway, auto-detection, signal ratings, band table, tests
-- `app/` — Android app: Compose UI, Room history, DataStore settings, WorkManager and alarm jobs, Glance widget, tile, updater
+```
+./gradlew :app:assembleRelease
+```
+
+The gateway module is plain Kotlin and builds without the Android SDK:
+
+```
+./gradlew -PgatewayOnly=true :gateway:test
+```
+
+| Folder | Contents |
+| --- | --- |
+| `gateway/` | Gateway clients (TMI and Nokia), demo gateway, auto-detection, signal ratings, tests |
+| `app/` | Android app: Compose UI, signal history (Room), settings (DataStore), background jobs, widget, tile, updater |
 
 ## Credits
 
-- [HINT Control](https://github.com/zacharee/HINTControl) by Zachary Wander — MIT License (see `LICENSE`). Gateway API flow, data models and safety warnings.
-- AndroidX / Jetpack Compose, Kotlin, OkHttp, ZXing — Apache 2.0.
+- **[HINT Control](https://github.com/zacharee/HINTControl)** by Zachary Wander: MIT License. Gateway API flow, data models and safety warnings.
+- **cmarker84** and **fitzmorrispr**: the G5AR/G5SE Wi-Fi client findings ([issue #123](https://github.com/zacharee/HINTControl/issues/123)).
+- AndroidX and Jetpack Compose, Kotlin, OkHttp, ZXing: Apache License 2.0.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Copyright (c) 2023 Zachary Wander; modifications (c) 2026 The412Banner.
+MIT, see [LICENSE](LICENSE).
+Copyright (c) 2023 Zachary Wander. Android rewrite copyright (c) 2026 The412Banner.
