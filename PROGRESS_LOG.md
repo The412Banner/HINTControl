@@ -12,6 +12,11 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~08:20 EST — 1.1.0: built-in speed test (feat/speed-test, in progress)
+**Why:** user: "updated to 1.0.1, works, can we add a simple speed test to the app, like ookla or something?" → options given (Ookla has no free API for other apps; M-Lab publishes testers' IPs) → user: "yes do it" for: Cloudflare-based test (speed.cloudflare.com, reference code MIT, endpoints checked 200) + "Open Speedtest by Ookla" button, release as 1.1.0 when green.
+**Plan:** engine in gateway module (plain Kotlin + OkHttp, MockWebServer tests): ping/jitter from small requests, download/upload with parallel streams, time + data caps, live progress, server from cf-ray; app: Speed test screen (More + Home card), results saved with the gateway signal at test time (band, RSRP, SINR) and phone Wi-Fi link speed, mobile-data confirm, Ookla button; PRIVACY/README updates; version 1.1.0 (vc 8).
+**Resume point:** branch feat/speed-test off main 55bbb0d. FIT runs 1.0.1 (user-updated 08:12).
+
 ## 2026-11-16 ~07:20–07:50 EST — 1.0.1: fixes from HINT Control issues (main, released)
 **Why:** user: "do 1-6 as 1.0.1, release it when green" (from the review of the 34 open HINT Control issues).
 **Plan:** (1) #122 slow gateway: retry detection with a longer timeout; (2) #84 VPN: say when a VPN may block the gateway; (3) #2/#129/#134 correct password refused: explain the gateway restart fix; (4) #102 band-change markers on the history chart; (5) #127 optional fixed chart scale; (6) #24 tower nicknames. Then version 1.0.1 (vc 7) → CI green → backup ref → main fast-forward → stable release v1.0.1.
