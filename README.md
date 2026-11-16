@@ -1,108 +1,104 @@
-# T-Mobile Home Internet Control
-A cross-platform app using JetBrains Compose to view and control the following T-Mobile Home Internet gateways:
-- Arcadyan KVD21
-- Arcadyan TMOG4AR
-- Sagemcom Fast 5688W
-- Sercomm TMOG4SE
-- Nokia 5G21
+# Banners HINT Control
 
-# Support
-Enjoying the app? [Donate here](https://www.paypal.com/donate/?hosted_button_id=EWAPDSENZ7U44).
+An Android app to view and control **T-Mobile Home Internet** gateways, rebuilt from the ground up in Jetpack Compose.
 
-# Translating
-HINT Control uses Crowdin to manage translations. [Help translate to your language here](https://crowdin.com/project/hint-control)!
+Based on [HINT Control](https://github.com/zacharee/HINTControl) by Zachary Wander (MIT). This fork is Android-only and focuses on a cleaner app, more tools and safer defaults. Not made by or affiliated with T-Mobile.
 
-[![Crowdin](https://badges.crowdin.net/hint-control/localized.svg)](https://crowdin.com/project/hint-control)
+## Supported gateways
 
-# Installing
-For Windows, macOS, and Linux, you can download from https://hintcontrol.zwander.dev.
-Alternatively, you can use the steps below to manually download a release.
+| Gateway | API | Status, signal | Devices, Wi-Fi, reboot | Change admin login |
+| --- | --- | --- | --- | --- |
+| Arcadyan KVD21, TMOG4AR | TMI v1 (port 8080) | ✓ (no login needed) | ✓ | ✓ |
+| Sagemcom FAST 5688W | TMI v1 | ✓ | ✓ | ✓ |
+| Sercomm TMOG4SE | TMI v1 | ✓ | ✓ | ✓ |
+| Nokia 5G21 | web CGI | ✓ | ✓ (no add/remove networks) | — |
 
-Check the [Releases page](https://github.com/zacharee/HINTControl/releases) for binaries.
+The gateway communication is ported from HINT Control. It is covered by unit tests against recorded responses, but this fork has **not yet been tested on real gateway hardware**. Reports are welcome.
 
-## Android
-The Android version is available on the [Google Play Store](https://play.google.com/store/apps/details?id=dev.zwander.arcadyankvd21control),
+A built-in **demo gateway** lets you try every screen without one.
 
-Alternatively, you can download `HINTControl_Android_<VERSION>.apk` and install it.
+## Features
 
-## iOS
-The iOS version is available on the [App Store](https://apps.apple.com/us/app/hint-control/id6449951339).
+**Home**
+- Signal score (0–100) and quality for 5G and LTE, bands with frequency (e.g. `n41 · 2.5 GHz`)
+- RSRP, SINR, RSRQ and RSSI gauges, signal bars, cell IDs
+- Uptime, network details, connected-device counts and a 30-minute SINR trend
+- Several gateways, each with its own saved login; switch from the title bar
 
-## Windows
-- On Intel or AMD devices, download the .zip ending in `windows-amd64`.
-- On ARM64 devices, download the .zip ending in `windows-aarch64`.
+**Signal**
+- Live readings with a rolling chart
+- **Placement mode**: one reading per second, a tone and a buzz that rise with the score, and the best spot remembered. Walk the gateway around the house and stop where it's highest.
+- History from 1 hour to 30 days, drag across a chart to read exact values, min/avg/max, band changes, CSV export
+- Cell details: PCI, EARFCN/NR-ARFCN, CQI, bandwidth, eNB/gNB (eNB worked out from the ECGI when the gateway doesn't report it), TAC, operator, supported bands, and the location the gateway reports
 
-## macOS
-- On Intel Macs, download the .zip ending in `mac-amd64`.
-- On Apple Silicon Macs, download the .zip ending in `mac-aarch64`.
+**Devices**
+- Search, filter (online, Wi-Fi, wired, new) and sort
+- Give devices your own names, see when they were first seen, spot new ones, and see when a device uses a private (randomised) MAC
 
-## Linux
-- On Debian-based systems, download the `.deb` file.
-- On other Linux distros, download the `.tar.gz` file.
+**Wi-Fi**
+- Edit network name, password, security, bands, visibility (hide or show the network name) and guest mode
+- Share any network as a QR code
+- Per-band radio switch, channel, width and transmit power; band steering
+- Every change is listed for review before saving, with warnings for risky ones (all radios off, 5 GHz off, renaming the network you're on)
 
-For Intel or AMD devices, download the `amd64` variant. For ARM64 devices, choose `aarch64` or `arm64`.
+**Gateway tools**
+- Reboot with live progress and measured downtime
+- **Scheduled reboot** (days and time), sent by the phone while it's on the gateway's network
+- Change the admin username and password (TMI gateways)
+- Gateway details with SIM numbers hidden until you tap, and a shareable status report for support
 
-# Usage Notes
-## iOS
-On iOS, when you enable Snapshots from the Settings page, the stored snapshots will be available in a JSON file from the Files app.
+**Alerts and background**
+- Notifications when the gateway goes offline (only while the phone is on its network), restarts, gets a weak signal, or a new device joins
+- Event log of restarts, outages, band changes and saved settings
+- Home-screen widget and Quick Settings tile with live 5G/LTE readings
+- Launcher shortcuts: live signal, devices, reboot
+- Automation: Tasker, MacroDroid, Automate and others can reboot or refresh through a token-protected broadcast
 
-To access the JSON:
-1. Open the Files app.
-2. Tap the "Browse" tab in the bottom right.
-3. Tap the "Browse" tab again to back out of "iCloud Drive".
-4. Choose "On My iPhone".
-5. Tap "HINT Control".
-6. Copy or share `snapshots.json` as needed.
+**App**
+- Material You, light/dark, pure black, layouts for phones, tablets and landscape handhelds
+- **In-app updates**: checks this repository's GitHub releases, shows the release notes, downloads the APK, checks its SHA-256 and package name, then hands it to Android's installer. Test builds (pre-releases) can be switched on or off.
+- API explorer (developer options) for raw gateway requests; passwords and tokens are hidden in the output
+- Local crash log you can share; nothing is uploaded
 
-# Support
-1. For questions about your T-Mobile Home Internet service, such as outages, speed, or billing, you'll need to contact [T-Mobile support](https://www.t-mobile.com/contact-us).
-2. If there's a bug or a crash in HINT Control, [open a new issue](https://github.com/zacharee/ArcadyanKVD21Control/issues) with as much detail as possible.
-3. If you'd like to request a new feature, please check the open and closed issues before creating a new one. Be aware that it might not be possible to implement.
-4. For anything else, send me an email at <zachary@zwander.dev>.
+## Fixed compared with HINT Control 1.17.3
 
-# Building
-## Desktop
-HINT Control makes use of [Conveyor](https://www.hydraulic.dev/) to create binaries for different desktop platforms.
+- Changing the 6 GHz channel or width overwrote the 5 GHz settings.
+- Nokia: SIM status always showed "not active"; login sent the stored credentials instead of the typed ones.
+- Gateway GPS position was never read (`latitude`/`longitude` vs `lat`/`lon`).
+- The gateway admin password was stored unencrypted; it is now encrypted with the Android Keystore.
+- Crash reports no longer go to a third-party service.
 
-Conveyor can build for Windows and Linux from any host OS, but macOS is required to build for macOS.
+## Install
 
-1. To build, first download and install Conveyor from the link above.
-2. Next, open a terminal to the project's root directory.
-3. Run `./gradlew :desktop:build` (`.\gradlew.bat :desktop:build` on Windows).
-4. Run the following command based on your target system.  
-   4.1. Intel/AMD (x86) Windows: `conveyor -Kapp.machines=windows.amd64 make windows-zip`.  
-   4.2. ARM64 Windows: `conveyor -Kapp.machines=windows.arm64 make windows-zip`.  
-   4.3. x86 Debian: `conveyor -Kapp.machines=linux.amd64 make debian-package`.  
-   4.4. ARM64 Debian: `conveyor -Kapp.machines=linux.arm64 make debian-package`.  
-   4.5. x86 Linux: `conveyor -Kapp.machines=linux.amd64 make linux-tarball`.  
-   4.6. ARM64 Linux: `conveyor -Kapp.machines=linux.arm64 make linux-tarball`.  
-   4.7. Intel Macs: `conveyor -Kapp.machines=mac.amd64 make unnotarized-mac-zip`.  
-   4.8. Apple Silicon Macs: `conveyor -Kapp.machines=mac.arm64 make unnotarized-mac-zip`.
-5. Check the `output` folder in the root of the project for the binary.
+Download the APK from [Releases](https://github.com/The412Banner/HINTControl/releases). Builds are signed with the public AOSP test key (v1 + v2 + v3), so every build installs over the previous one. Android 8.0 or newer.
 
-## Android
-1. Open the project in Android Studio.
-2. Build the APK or run the Android configuration with your device plugged in.
+The app uses a different package name (`com.banner.hintcontrol`) from the original, so both can be installed side by side.
 
-## iOS
-### Creating an IPA
-1. Open `iosApp/iosApp.xcworkspace` in Xcode.
-2. Open the "Product" menu, choose "Destination", and select "Any iOS Device (arm64)".
-3. Open the "Product" menu again and select "Archive".
-4. Once the build completes, a new window will open listing the newly-created archive.
-5. Right click the archive and select "Show in Finder".
-6. Right click the highlighted file in Finder and select "Show Package Contents".
-7. Go to `Products/Applications` and create a new folder called `Payload`.
-8. Drag `HINT Control.app` into the `Payload` folder.
-9. Right click `Payload` and choose "Compress".
-10. Change the resulting .zip file extension to .ipa.
+## Automation intents
 
-### Running on a Simulator or Device
-1. Open `iosApp/iosApp.xcworkspace` in Xcode.
-2. Choose your target device in the top of the window.
-3. Press the "Play" button to the left.
+Turn on **More → Automation**, then send a broadcast:
 
-# Error Reporting
-HINT Control uses Bugsnag for error reporting.
+| | |
+| --- | --- |
+| Action | `com.banner.hintcontrol.action.REBOOT` or `com.banner.hintcontrol.action.REFRESH` |
+| Package | `com.banner.hintcontrol` |
+| Extra | `token` = the token shown in the app |
 
-<a href="https://www.bugsnag.com"><img src="https://assets-global.website-files.com/607f4f6df411bd01527dc7d5/63bc40cd9d502eda8ea74ce7_Bugsnag%20Full%20Color.svg" width="200"></a>
+## Building
+
+GitHub Actions builds every push to `feat/**` and `fix/**` (`.github/workflows/build.yml`): gateway and app unit tests, release APK, test-key signing with v1/v2/v3 verification, and screenshots of every screen rendered with demo data (Robolectric + Roborazzi).
+
+Locally: `./gradlew :app:assembleRelease` (Android SDK, JDK 17+). The gateway module alone builds without the Android SDK: `./gradlew -PgatewayOnly=true :gateway:test`.
+
+Project layout:
+- `gateway/` — plain Kotlin: TMI and Nokia clients, demo gateway, auto-detection, signal ratings, band table, tests
+- `app/` — Android app: Compose UI, Room history, DataStore settings, WorkManager and alarm jobs, Glance widget, tile, updater
+
+## Credits
+
+- [HINT Control](https://github.com/zacharee/HINTControl) by Zachary Wander — MIT License (see `LICENSE`). Gateway API flow, data models and safety warnings.
+- AndroidX / Jetpack Compose, Kotlin, OkHttp, ZXing — Apache 2.0.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2023 Zachary Wander; modifications (c) 2026 The412Banner.

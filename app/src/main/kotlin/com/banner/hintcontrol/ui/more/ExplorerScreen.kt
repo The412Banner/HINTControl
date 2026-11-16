@@ -113,7 +113,7 @@ fun ExplorerScreen() {
             if (method == "POST") {
                 OutlinedTextField(body, { body = it }, label = { Text("JSON body") }, minLines = 3, modifier = Modifier.fillMaxWidth(), textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace))
             }
-            Button(onClick = { if (method == "GET") vm.send(method, path, null) else confirm = true }, enabled = !ui.busy && path.isNotBlank()) {
+            Button(onClick = { if (method == "GET") vm.send(method, path, null) else { confirm = true } }, enabled = !ui.busy && path.isNotBlank()) {
                 if (ui.busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Text("Send")
             }
             ui.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }

@@ -37,8 +37,8 @@ import com.banner.hintcontrol.ui.theme.NumberStyle
 @Composable
 fun SectionCard(
     title: String?,
-    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    modifier: Modifier = Modifier,
     trailing: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,

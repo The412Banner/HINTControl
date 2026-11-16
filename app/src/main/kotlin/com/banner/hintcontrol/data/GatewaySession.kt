@@ -158,6 +158,10 @@ class GatewaySession(
     suspend fun passwordChanged(username: String, password: String, remember: Boolean) {
         val p = active.value ?: return
         if (username != p.username) profiles.save(p.copy(username = username))
-        if (remember) profiles.setPassword(p.id, password) else sessionPassword = p.id to password
+        if (remember) {
+            profiles.setPassword(p.id, password)
+        } else {
+            sessionPassword = p.id to password
+        }
     }
 }

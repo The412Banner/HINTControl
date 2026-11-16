@@ -1,33 +1,17 @@
-# Privacy Policy
-HINT Control collects no personal information from your device. Any data that is collected is non-sensitive and anonymous.
+# Privacy Policy — Banners HINT Control
 
-## Crash Reports
-HINT Control uses Bugsnag to collect crash reports on Desktop, Android, and iOS. Bugsnag reports are completely anonymous and only contain basic information needed for debugging.
+Banners HINT Control collects no personal information and has no analytics or crash-reporting service.
 
-This information usually includes:
-- Stack traces (where a crash or error occurred in the source code).
-- Device information such as OS version and model.
-- HTTP information such as the content of requests and responses (stripped to remove credentials *before* being uploaded).
-- Breadcrumbs (where the app navigated and when it went to the background/foreground leading up to the error).
+## What the app talks to
+- **Your gateway**, on your local network, to read status and change settings you ask it to change.
+- **GitHub** (`api.github.com` and GitHub's download servers), only to check this repository's releases for app updates and to download an update you choose to install. Update checks can be turned off in Settings. The request carries only a generic app name and version.
 
-Reports do not include any personal information, including, but not limited to:
-- Name.
-- Email address.
-- Phone number.
-- IMEI.
-- SIM ID.
-- Location.
-- Statistics from your gateway, such as Cell ID or connected bands.
+## What is stored on your phone
+- Gateway profiles (name, address, username). Saved passwords are encrypted with a key kept in the Android Keystore.
+- Signal history, device nicknames and the event log, kept for as long as you choose in Settings.
+- The last crash report, if the app crashed. It stays on the phone; you can share or delete it from Settings.
 
-## Gateway Password
-HINT Control can optionally store your gateway login and automatically authenticate on subsequent app launches.
+App data is excluded from Android cloud backup and device transfer.
 
-- On Android and iOS, the password is stored in the app's private data, which is inaccessible to anything but the system and root.
-- On Desktop, the password is stored in plaintext.
-
-On all platforms, the password is only stored locally and never uploaded or transmitted except directly to the gateway for authentication.
-
-### Password Leaks
-Even if HINT Control did upload your password, you shouldn't need to worry. The T-Mobile gateways are only accessible from the local network side, not through the internet.
-
-Even if someone has the public IP (v6 only, since there is no public v4 addressing on T-Mobile) of your gateway, they won't be able to connect, whether or not they know your password.
+## Sharing
+Nothing leaves your phone unless you share it yourself (status report, CSV export, crash log). The status report masks SIM numbers.

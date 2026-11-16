@@ -134,7 +134,11 @@ class OverviewViewModel(private val c: AppContainer) : ViewModel() {
     init {
         viewModelScope.launch {
             c.session.access.map { it == Access.LoggedIn }.collect { loggedIn ->
-                if (loggedIn) loadCounts() else counts.value = null
+                if (loggedIn) {
+                    loadCounts()
+                } else {
+                    counts.value = null
+                }
             }
         }
     }
@@ -222,7 +226,7 @@ fun OverviewContent(
             when {
                 main == null && ui.live.error != null -> ErrorBox(ui.live.error?.userMessage().orEmpty(), offline = ui.live.offline, onRetry = onRefresh)
                 main == null -> LoadingBox(text = "Reading the gateway…")
-                else -> OverviewGrid(ui, main, onReboot, onDevices, onSignal, onGateway, onRefresh)
+                else -> main?.let { OverviewGrid(ui, it, onReboot, onDevices, onSignal, onGateway, onRefresh) }
             }
         }
     }
