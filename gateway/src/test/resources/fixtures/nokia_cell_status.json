@@ -1,0 +1,5 @@
+{
+  "cell_stat_generic": [ { "RoamingStatus": "Home", "CurrentAccessTechnology": "5G NSA", "X_ALU_COM_TAC": "22233" } ],
+  "cell_stat_lte": [ { "SNRCurrent": 8, "RSRPCurrent": -98, "RSRQCurrent": -13, "Band": "B66", "Bandwidth": "20MHz", "RSRPStrengthIndexCurrent": 3, "PLMNName": "T-Mobile", "CQI": "9", "ECGI": "31026079478540", "MCC": "310", "MNC": "260", "eNBID": "310463", "Cellid": "12", "RSSICurrent": -70 } ],
+  "cell_stat_5G": [ { "SNRCurrent": 15, "RSRPCurrent": -90, "RSRQCurrent": -11, "Band": "n71", "Bandwidth": "20MHz", "RSRPStrengthIndexCurrent": 4, "RSSICurrent": -60 } ]
+}

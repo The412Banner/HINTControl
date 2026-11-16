@@ -1,0 +1,19 @@
+{
+  "clients": {
+    "2.4ghz": [
+      { "connected": true, "ipv4": "192.168.12.150", "ipv6": [], "mac": "64:16:66:22:91:AF", "name": "Thermostat", "signal": -61 }
+    ],
+    "5.0ghz": [],
+    "ethernet": [
+      {
+        "connected": true,
+        "ipv4": "192.168.12.187",
+        "ipv6": [
+          "fe80::7a45:58ff:fee6:72c6",
+        ],
+        "mac": "D2:B5:49:86:71:DE",
+        "name": ""
+      }
+    ]
+  }
+}

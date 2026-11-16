@@ -1,0 +1,37 @@
+{
+  "2.4ghz": {
+    "airtimeFairness": true,
+    "channel": "Auto",
+    "channelBandwidth": "Auto",
+    "isMUMIMOEnabled": true,
+    "isRadioEnabled": true,
+    "isWMMEnabled": true,
+    "maxClients": 128,
+    "mode": "auto",
+    "transmissionPower": "100%"
+  },
+  "5.0ghz": {
+    "airtimeFairness": true,
+    "channel": "Auto",
+    "channelBandwidth": "80MHz",
+    "isMUMIMOEnabled": true,
+    "isRadioEnabled": true,
+    "isWMMEnabled": true,
+    "maxClients": 128,
+    "mode": "auto",
+    "transmissionPower": "100%"
+  },
+  "bandSteering": { "isEnabled": true },
+  "ssids": [
+    {
+      "2.4ghzSsid": true,
+      "5.0ghzSsid": true,
+      "encryptionMode": "AES",
+      "encryptionVersion": "WPA2/WPA3",
+      "guest": false,
+      "isBroadcastEnabled": true,
+      "ssidName": "WIFI_SSID",
+      "wpaKey": "some_wifi_password"
+    }
+  ]
+}

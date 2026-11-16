@@ -1,0 +1,34 @@
+{
+  "cell": {
+    "4g": {
+      "bandwidth": "15M",
+      "cqi": 9,
+      "earfcn": "875",
+      "ecgi": "31026079478540",
+      "mcc": "310",
+      "mnc": "260",
+      "pci": "63",
+      "plmn": "310260",
+      "sector": { "bands": ["b2"], "bars": 2.0, "cid": 12, "eNBID": 310463, "rsrp": -101, "rsrq": -12, "rssi": -90, "sinr": 4 },
+      "status": true,
+      "supportedBands": ["b2", "b4", "b5", "b12", "b41", "b46", "b66", "b71"],
+      "tac": "22233"
+    },
+    "5g": {
+      "bandwidth": "100M",
+      "cqi": 12,
+      "earfcn": "520110",
+      "ecgi": "3102600",
+      "mcc": "310",
+      "mnc": "260",
+      "pci": "781",
+      "plmn": "310260",
+      "sector": { "bands": ["n41"], "bars": 4.0, "cid": 0, "gNBID": 0, "rsrp": -88, "rsrq": -11, "rssi": -63, "sinr": 17 },
+      "status": true,
+      "supportedBands": ["n25", "n41", "n66", "n71"],
+      "tac": "0"
+    },
+    "generic": { "apn": "FBB.HOME", "hasIPv6": true, "registration": "registered", "roaming": false },
+    "gps": { "latitude": 39.9526, "longitude": -75.1652 }
+  }
+}

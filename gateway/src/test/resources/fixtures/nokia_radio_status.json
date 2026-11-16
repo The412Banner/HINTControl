@@ -1,0 +1,6 @@
+{
+  "connection_status": [ { "ConnectionStatus": 1 } ],
+  "apn_cfg": [ { "oid": 1, "Enable": 1, "APN": "fbb.home", "X_ALU_COM_IPAddressV4": "10.0.0.2", "X_ALU_COM_IPAddressV6": "2607:fb90::1" } ],
+  "cell_LTE_stats_cfg": [ { "stat": { "DownlinkEarfcn": 66786, "PhysicalCellID": "63" } } ],
+  "cell_5G_stats_cfg": [ { "stat": { "Downlink_NR_ARFCN": 4294967295, "PhysicalCellID": "0" } } ]
+}

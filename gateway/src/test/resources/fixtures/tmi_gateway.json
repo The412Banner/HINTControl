@@ -1,0 +1,52 @@
+{
+  "device": {
+    "friendlyName": "5G Gateway",
+    "hardwareVersion": "R01",
+    "isEnabled": true,
+    "isMeshSupported": true,
+    "macId": "11:AC:67:81:18:86",
+    "manufacturer": "Arcadyan",
+    "manufacturerOUI": "001A2A",
+    "model": "KVD21",
+    "name": "5G Gateway",
+    "role": "gateway",
+    "serial": "123456789B",
+    "softwareVersion": "1.00.18",
+    "type": "HSID",
+    "updateState": "latest"
+  },
+  "signal": {
+    "4g": {
+      "bands": ["b2"],
+      "bars": 3,
+      "cid": 12,
+      "eNBID": 310463,
+      "rsrp": -101,
+      "rsrq": -12,
+      "rssi": -90,
+      "sinr": 4
+    },
+    "5g": {
+      "bands": ["n41"],
+      "bars": 4,
+      "cid": 0,
+      "gNBID": 0,
+      "rsrp": -88,
+      "rsrq": -11,
+      "rssi": -63,
+      "sinr": 17
+    },
+    "generic": {
+      "apn": "FBB.HOME",
+      "hasIPv6": true,
+      "registration": "registered",
+      "roaming": false
+    }
+  },
+  "time": {
+    "daylightSavings": { "isUsed": true },
+    "localTime": 1685309071,
+    "localTimeZone": "<-04>4",
+    "upTime": 30996
+  }
+}

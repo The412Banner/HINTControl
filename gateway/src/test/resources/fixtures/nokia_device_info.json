@@ -1,0 +1,10 @@
+{
+  "device_app_status": [
+    { "ManufacturerOUI": "000ADE", "ProductClass": "5G21", "SerialNumber": "ALCLB1234567", "HardwareVersion": "3FE49568HJIJ", "SoftwareVersion": "3FE49568IJIJ50", "Description": "Nokia 5G Gateway", "UpTime": 86400 }
+  ],
+  "device_cfg": [
+    { "_oid": 1, "HostName": "Desktop", "IPAddress": "192.168.12.10", "MACAddress": "AA:BB:CC:00:11:22", "Active": 1, "InterfaceType": "Ethernet" },
+    { "_oid": 2, "HostName": "Phone", "IPAddress": "192.168.12.11", "MACAddress": "DA:BB:CC:00:11:23", "Active": 1, "InterfaceType": "802.11ax" },
+    { "_oid": 3, "HostName": "Plug", "IPAddress": "192.168.12.12", "MACAddress": "10:BB:CC:00:11:24", "Active": 0, "InterfaceType": "802.11" }
+  ]
+}

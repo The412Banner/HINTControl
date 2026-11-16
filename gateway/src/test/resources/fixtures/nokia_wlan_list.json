@@ -1,0 +1,6 @@
+{
+  "wlan_list": [
+    { "oid": 1, "Enable": 1, "Type": "2.4G", "SSID": "Nokia-24", "IsGuestSSID": 0, "BeaconType": "WPAand11i", "WPAEncryptionModes": "AESEncryption", "PreSharedKey": "password24", "SSIDAdvertisementEnabled": 1 },
+    { "oid": 5, "Enable": 1, "Type": "5G", "SSID": "Nokia-5", "IsGuestSSID": 0, "BeaconType": "11i", "WPAEncryptionModes": "AESEncryption", "PreSharedKey": "password5g", "SSIDAdvertisementEnabled": 0 }
+  ]
+}
