@@ -36,7 +36,7 @@ class SignalTileService : TileService() {
             val profile = c.profiles.active.value ?: return@launch
             runCatching { c.session.status { it.mainData() } }
                 .onSuccess { c.summaries.save(it.toSummary(profile.name)) }
-                .onFailure { c.summaries.markOffline(profile.name) }
+                .onFailure { c.summaries.markOffline(profile.name, profile.host.takeUnless { profile.isDemo }) }
             show(c.summaries.load())
         }
     }
@@ -52,7 +52,7 @@ class SignalTileService : TileService() {
             !summary.online -> {
                 tile.state = Tile.STATE_INACTIVE
                 tile.label = summary.gatewayName
-                setSubtitle(tile, "Offline")
+                setSubtitle(tile, if (summary.away) "Not on its network" else "Offline")
             }
             summary.nrRsrp != null -> {
                 tile.state = Tile.STATE_ACTIVE

@@ -95,7 +95,11 @@ fun MoreScreen() {
         scheduleSummary = settings.rebootSchedule.summary(),
         canChangeLogin = vm.capabilities()?.changeLogin == true,
         developerMode = settings.developerMode,
-        updateAvailable = (update as? UpdateState.Available)?.release?.tag,
+        updateAvailable = when (val u = update) {
+            is UpdateState.Available -> u.release.tag
+            is UpdateState.ReadyToInstall -> u.release.tag
+            else -> null
+        },
         profileCount = profiles.profiles.size,
     )
     MoreContent(ui)

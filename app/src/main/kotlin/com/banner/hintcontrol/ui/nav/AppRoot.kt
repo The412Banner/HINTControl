@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -121,9 +122,15 @@ private fun MainScaffold(container: AppContainer, link: String?, onLinkHandled: 
         if (s.autoUpdateCheck && System.currentTimeMillis() - s.lastUpdateCheck > 6 * 3_600_000L) container.updates.check()
     }
 
+    // Sub-screens (Updates, Event log, …) are not nested under a tab, so keep the tab they were opened from highlighted.
+    val currentTop = TopDestination.entries.firstOrNull { d -> destination?.hierarchy?.any(d.matches) == true }
+    var lastTop by rememberSaveable { mutableStateOf(TopDestination.Overview.name) }
+    LaunchedEffect(currentTop) { if (currentTop != null) lastTop = currentTop.name }
+    val selectedTop = currentTop ?: TopDestination.valueOf(lastTop)
+
     AppNavigationSuite(
-        isSelected = { d -> destination?.hierarchy?.any(d.matches) == true },
-        updateBadge = update is UpdateState.Available,
+        isSelected = { d -> d == selectedTop },
+        updateBadge = update is UpdateState.Available || update is UpdateState.ReadyToInstall,
         onSelect = { d -> nav.goTop(d.route) },
     ) {
         CompositionLocalProvider(LocalAppActions provides actions) {

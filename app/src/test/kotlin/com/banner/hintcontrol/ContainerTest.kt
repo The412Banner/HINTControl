@@ -46,6 +46,12 @@ class ContainerTest {
             assertTrue("rows=${stored.size} pollerError=${c.status.state.value.error}", stored.isNotEmpty())
             assertTrue(withTimeout(10_000) { c.history.sampleCount(profile.id).first { it > 0 } } > 0)
             assertNotNull(c.summaries.load()?.nrRsrp)
+            // Unreachable while the phone isn't on the gateway's network → "away", not "offline".
+            c.summaries.markOffline("Home", host = "192.0.2.1")
+            assertEquals(true, c.summaries.load()?.away)
+            c.summaries.markOffline("Home")
+            assertEquals(false, c.summaries.load()?.away)
+            assertEquals(false, c.summaries.load()?.online)
 
             val wifi = c.session.authed { it.wifiConfig() }
             c.session.authed { it.setWifiConfig(wifi.copy(bandSteering = BandSteeringConfig(false))) }

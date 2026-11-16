@@ -98,6 +98,7 @@ private fun WidgetBody(summary: StatusSummary?) {
         Spacer(GlanceModifier.height(6.dp))
         when {
             summary == null -> Text("Open the app to connect", style = TextStyle(color = dim, fontSize = 12.sp))
+            !summary.online && summary.away -> Text("Not on gateway network", style = TextStyle(color = dim, fontSize = 14.sp, fontWeight = FontWeight.Bold))
             !summary.online -> Text("Gateway offline", style = TextStyle(color = ColorProvider(qualityColor(Quality.Poor)), fontSize = 16.sp, fontWeight = FontWeight.Bold))
             else -> {
                 RadioRow("5G", summary.nrBand, summary.nrRsrp, summary.nrSinr)
@@ -139,7 +140,7 @@ class RefreshAction : ActionCallback {
         val profile = c.profiles.active.value ?: return
         runCatching { c.session.status { it.mainData() } }
             .onSuccess { c.summaries.save(it.toSummary(profile.name)) }
-            .onFailure { c.summaries.markOffline(profile.name) }
+            .onFailure { c.summaries.markOffline(profile.name, profile.host.takeUnless { profile.isDemo }) }
         StatusWidget().updateAll(context)
     }
 }

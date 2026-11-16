@@ -100,7 +100,7 @@ class StatusRepository(
             throw e
         } catch (e: Exception) {
             _state.update { it.copy(error = e, refreshing = false) }
-            if (e.isOffline) summaries.markOffline(profile.name)
+            if (e.isOffline) summaries.markOffline(profile.name, profile.host.takeUnless { profile.isDemo })
         }
     }
 

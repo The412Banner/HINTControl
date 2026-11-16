@@ -20,6 +20,7 @@ class HintApp : Application() {
         container = AppContainer(this)
         container.notifier.createChannels()
         container.scope.launch {
+            runCatching { container.updates.clearDownloads() }
             val first = container.settings.current()
             runCatching { container.scheduler.apply(first) }
             container.settings.settings

@@ -25,11 +25,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.banner.hintcontrol.AppContainer
@@ -83,11 +87,17 @@ fun UpdatesScreen() {
     val actions = LocalAppActions.current
     val context = LocalContext.current
     LaunchedEffect(Unit) { if (state is UpdateState.Idle) vm.check() }
+    // Re-checked on every resume: the "install unknown apps" switch is flipped in Android's settings.
+    var canInstall by remember { mutableStateOf(UpdateInstaller.canInstall(context)) }
+    LifecycleResumeEffect(Unit) {
+        canInstall = UpdateInstaller.canInstall(context)
+        onPauseOrDispose { }
+    }
     SubScreen("Updates", actions.back) {
         UpdatesBody(
             state = state,
             settings = settings,
-            canInstall = UpdateInstaller.canInstall(context),
+            canInstall = canInstall,
             onCheck = { vm.check() },
             onDownload = { vm.download(it) },
             onInstall = { r, f -> vm.install(r, f) },

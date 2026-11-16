@@ -80,6 +80,11 @@ class UpdateRepository(
 
     val installedVersion: AppVersion? get() = AppVersion.parse(installed)
 
+    /** Called at app start: a downloaded APK is either installed by now or no longer tracked. */
+    fun clearDownloads() {
+        File(context.cacheDir, "updates").listFiles()?.forEach { it.delete() }
+    }
+
     /** Returns the newest release this install should be offered, or null when up to date. */
     suspend fun check(): AppRelease? {
         _state.value = UpdateState.Checking

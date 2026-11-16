@@ -11,6 +11,8 @@ data class StatusSummary(
     val gatewayName: String,
     val time: Long,
     val online: Boolean,
+    /** Not reachable and the phone isn't on the gateway's network, so "offline" would be misleading. */
+    val away: Boolean = false,
     val nrBand: String? = null,
     val nrRsrp: Int? = null,
     val nrSinr: Int? = null,
@@ -40,16 +42,21 @@ fun MainData.toSummary(name: String, now: Long = System.currentTimeMillis()): St
     )
 }
 
-class SummaryStore(context: Context) {
+class SummaryStore(private val context: Context) {
     private val prefs = context.getSharedPreferences("summary", Context.MODE_PRIVATE)
 
     fun save(summary: StatusSummary) {
         prefs.edit().putString(KEY, storeJson.encodeToString(StatusSummary.serializer(), summary)).apply()
     }
 
-    fun markOffline(name: String, now: Long = System.currentTimeMillis()) {
+    /**
+     * Records that the gateway didn't answer. Pass [host] (not for the demo gateway) so a phone that
+     * is simply away from the gateway's network is shown as "not on gateway network", not "offline".
+     */
+    fun markOffline(name: String, host: String? = null, now: Long = System.currentTimeMillis()) {
+        val away = host != null && !NetworkInfo.onGatewayNetwork(context, host)
         val last = load()
-        save((last ?: StatusSummary(gatewayName = name, time = now, online = false)).copy(gatewayName = name, online = false, time = now))
+        save((last ?: StatusSummary(gatewayName = name, time = now, online = false)).copy(gatewayName = name, online = false, away = away, time = now))
     }
 
     fun load(): StatusSummary? = prefs.getString(KEY, null)?.let {

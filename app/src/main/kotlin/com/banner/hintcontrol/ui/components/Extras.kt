@@ -7,8 +7,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -119,7 +121,7 @@ fun wifiQrText(ssid: String, password: String?, security: String, hidden: Boolea
     }
 }
 
-/** Renders GitHub release notes: headings, bullets, **bold** and `code`. */
+/** Renders GitHub release notes: headings, bullets, > quotes, **bold** and `code`. */
 @Composable
 fun MarkdownLite(text: String, modifier: Modifier = Modifier) {
     Column(modifier) {
@@ -134,6 +136,13 @@ fun MarkdownLite(text: String, modifier: Modifier = Modifier) {
                         style = if (level <= 2) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall,
                         modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
                     )
+                }
+                line.startsWith(">") -> {
+                    Row(Modifier.height(IntrinsicSize.Min).padding(vertical = 2.dp)) {
+                        Box(Modifier.width(3.dp).fillMaxHeight().background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp)))
+                        Spacer(Modifier.width(10.dp))
+                        Text(inline(line.drop(1).trim()), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
                 line.trimStart().startsWith("- ") || line.trimStart().startsWith("* ") -> {
                     val indent = (line.length - line.trimStart().length) / 2
