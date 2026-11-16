@@ -374,7 +374,7 @@ private fun CellTab(ui: SignalUi, onLoad: () -> Unit, onLogin: (String, Boolean)
         cell.needsLogin && cell.data == null -> LoginPrompt(busy = ui.loginBusy || ui.access is Access.LoggingIn, error = ui.loginError, onLogin = onLogin)
         cell.data == null && cell.error != null -> ErrorBox(cell.error, onRetry = onLoad)
         cell.data == null -> LoadingBox(text = "Reading cell details…")
-        else -> cell.data?.let { CellDetails(it, onLoad) }
+        else -> CellDetails(cell.data, onLoad)
     }
 }
 

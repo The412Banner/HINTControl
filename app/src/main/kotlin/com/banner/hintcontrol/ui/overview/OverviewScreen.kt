@@ -30,7 +30,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.ShowChart
+import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material.icons.outlined.Wifi
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -224,9 +224,9 @@ fun OverviewContent(
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
             when {
-                main == null && ui.live.error != null -> ErrorBox(ui.live.error?.userMessage().orEmpty(), offline = ui.live.offline, onRetry = onRefresh)
+                main == null && ui.live.error != null -> ErrorBox(ui.live.error.userMessage(), offline = ui.live.offline, onRetry = onRefresh)
                 main == null -> LoadingBox(text = "Reading the gateway…")
-                else -> main?.let { OverviewGrid(ui, it, onReboot, onDevices, onSignal, onGateway, onRefresh) }
+                else -> OverviewGrid(ui, main, onReboot, onDevices, onSignal, onGateway, onRefresh)
             }
         }
     }
@@ -279,7 +279,7 @@ private fun OverviewGrid(
         if (ui.live.error != null) {
             item(span = StaggeredGridItemSpan.FullLine) {
                 Banner(
-                    text = if (ui.live.offline) "Gateway not answering — showing the last reading from ${Format.ago(ui.live.updatedAt)}" else ui.live.error?.userMessage().orEmpty(),
+                    text = if (ui.live.offline) "Gateway not answering — showing the last reading from ${Format.ago(ui.live.updatedAt)}" else ui.live.error.userMessage(),
                     action = "Retry",
                     onAction = onRefresh,
                 )
@@ -289,7 +289,7 @@ private fun OverviewGrid(
         if (nr != null) item { RadioCard("5G", nr, true) }
         if (lte != null) item { RadioCard("LTE", lte, false) }
         if (nr == null && lte == null) item {
-            SectionCard("Radio", Icons.Outlined.ShowChart) { Text("The gateway reports no cellular connection right now.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            SectionCard("Radio", Icons.AutoMirrored.Outlined.ShowChart) { Text("The gateway reports no cellular connection right now.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
         if (ui.trendNr.size > 2 || ui.trendLte.size > 2) item { TrendCard(ui.trendNr, ui.trendLte, onSignal) }
         item { DevicesCard(ui.clientCounts, ui.access, onDevices) }
@@ -371,7 +371,7 @@ private fun RadioCard(title: String, cell: BaseCellData, nr: Boolean) {
 
 @Composable
 private fun TrendCard(nr: List<Float>, lte: List<Float>, onOpen: () -> Unit) {
-    SectionCard("SINR, last 30 minutes", Icons.Outlined.ShowChart, onClick = onOpen, trailing = { Icon(Icons.AutoMirrored.Outlined.ArrowForward, null) }) {
+    SectionCard("SINR, last 30 minutes", Icons.AutoMirrored.Outlined.ShowChart, onClick = onOpen, trailing = { Icon(Icons.AutoMirrored.Outlined.ArrowForward, null) }) {
         if (nr.size > 2) {
             Text("5G  ${nr.last().toInt()} dB", style = MaterialTheme.typography.labelMedium)
             Sparkline(nr, MaterialTheme.colorScheme.primary, Modifier.fillMaxWidth().height(40.dp).padding(vertical = 4.dp))

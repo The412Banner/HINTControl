@@ -112,7 +112,7 @@ class SignalViewModel(private val c: AppContainer) : ViewModel() {
                 local.update { ui ->
                     var p = ui.placement
                     val now = if (ui.tech == Tech.NR) nr else lte
-                    if (p.on && now?.score != null && (p.best == null || now.score > p.best!!)) p = p.copy(best = now.score, bestAt = t)
+                    if (p.on && now?.score != null && (p.best == null || now.score > p.best)) p = p.copy(best = now.score, bestAt = t)
                     ui.copy(
                         readingsNr = (ui.readingsNr + listOfNotNull(nr)).takeLast(MAX_READINGS),
                         readingsLte = (ui.readingsLte + listOfNotNull(lte)).takeLast(MAX_READINGS),

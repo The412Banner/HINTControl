@@ -77,9 +77,9 @@ class HistoryRepository(private val db: HistoryDatabase) {
             db.samples().insert(sample)
             lastRecorded[profileId] = now
         }
-        if (rebooted) addEvent(profileId, EventType.RebootDetected, "Uptime ${formatUptimeShort(sample.uptime ?: 0)}", now)
-        if (nrChanged != null && previous != null) addEvent(profileId, EventType.BandChange, "5G ${nrChanged.first ?: "none"} → ${nrChanged.second ?: "none"}", now)
-        if (lteChanged != null && previous != null) addEvent(profileId, EventType.BandChange, "LTE ${lteChanged.first ?: "none"} → ${lteChanged.second ?: "none"}", now)
+        if (rebooted) addEvent(profileId, EventType.RebootDetected, "Uptime ${formatUptimeShort(sample.uptime)}", now)
+        if (nrChanged != null) addEvent(profileId, EventType.BandChange, "5G ${nrChanged.first ?: "none"} → ${nrChanged.second ?: "none"}", now)
+        if (lteChanged != null) addEvent(profileId, EventType.BandChange, "LTE ${lteChanged.first ?: "none"} → ${lteChanged.second ?: "none"}", now)
         Observation(sample, rebooted, nrChanged, lteChanged)
     }
 

@@ -99,7 +99,8 @@ class WifiViewModel(private val c: AppContainer) : ViewModel() {
         val ui = _ui.value
         val draft = ui.draft ?: return
         val summary = ui.changes
-        viewModelScope.launch {
+        // App scope: leaving the screen must not cancel a save halfway.
+        c.scope.launch {
             _ui.update { it.copy(saving = true, saveError = null) }
             try {
                 c.session.authed { it.setWifiConfig(draft.config) }

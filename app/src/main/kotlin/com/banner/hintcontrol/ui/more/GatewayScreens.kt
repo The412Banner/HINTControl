@@ -259,7 +259,7 @@ class AdminLoginViewModel(private val c: AppContainer) : ViewModel() {
     val ui: StateFlow<Ui> = _ui.asStateFlow()
 
     fun change(username: String, password: String, remember: Boolean) {
-        viewModelScope.launch {
+        c.scope.launch {
             _ui.update { it.copy(busy = true, error = null) }
             try {
                 c.session.authed { it.setLogin(username, password) }

@@ -41,7 +41,7 @@ class ContainerTest {
             // The poller records a sample on its own, even though this collector has already stopped.
             assertTrue(withTimeout(10_000) { c.history.sampleCount(profile.id).first { it > 0 } } > 0)
             val obs = c.history.observe(profile.id, live.main!!, record = true, minIntervalMs = 0)
-            assertEquals(live.main?.signal?.fiveG?.rsrp, obs.sample.nrRsrp)
+            assertEquals(live.main.signal?.fiveG?.rsrp, obs.sample.nrRsrp)
             val stored = c.history.samplesOnce(profile.id, 0)
             assertTrue("rows=${stored.size} pollerError=${c.status.state.value.error}", stored.isNotEmpty())
             assertTrue(withTimeout(10_000) { c.history.sampleCount(profile.id).first { it > 0 } } > 0)
