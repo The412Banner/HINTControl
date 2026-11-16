@@ -37,6 +37,12 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
+/** Keeps the demo's boot time across app restarts, so restarting or updating the app isn't seen as a gateway restart. */
+interface DemoBootTimeStore {
+    fun load(): Long?
+    fun save(bootedAt: Long)
+}
+
 /**
  * A simulated gateway for trying the app without hardware. Values drift slowly, the Wi-Fi
  * settings can be changed and a reboot takes the "gateway" offline for [rebootDowntimeMs].
@@ -46,6 +52,7 @@ class DemoGatewayClient(
     private val random: Random = Random(7),
     private val latencyMs: Long = 120L,
     private val rebootDowntimeMs: Long = 25_000L,
+    private val bootTime: DemoBootTimeStore? = null,
 ) : GatewayClient {
     override val kind = GatewayKind.Demo
     override val host = "demo"
@@ -65,7 +72,7 @@ class DemoGatewayClient(
     private var loggedIn = false
     private var username = "admin"
     private var password = DEMO_PASSWORD
-    private var bootedAt = clock() - 3L * 24 * 3600 * 1000 - 5 * 3600 * 1000
+    private var bootedAt = bootTime?.load() ?: (clock() - 3L * 24 * 3600 * 1000 - 5 * 3600 * 1000).also { bootTime?.save(it) }
     private var offlineUntil = 0L
 
     // Random-walk state for the radio values.
@@ -222,6 +229,7 @@ class DemoGatewayClient(
         val now = clock()
         offlineUntil = now + rebootDowntimeMs
         bootedAt = offlineUntil
+        bootTime?.save(bootedAt)
         return RebootResult.Accepted
     }
 

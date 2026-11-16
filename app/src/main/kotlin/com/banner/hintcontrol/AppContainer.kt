@@ -14,6 +14,7 @@ import com.banner.hintcontrol.data.SpeedTestStore
 import com.banner.hintcontrol.data.SummaryStore
 import com.banner.hintcontrol.data.appDataStore
 import com.banner.hintcontrol.data.db.HistoryDatabase
+import com.banner.hintcontrol.gateway.demo.DemoBootTimeStore
 import com.banner.hintcontrol.tile.SignalTileService
 import com.banner.hintcontrol.update.UpdateRepository
 import com.banner.hintcontrol.widget.StatusWidget
@@ -34,7 +35,11 @@ class AppContainer(
     val profiles = ProfileRepository(context.appDataStore, SecretCipher(), scope)
     val database: HistoryDatabase = database ?: HistoryDatabase.create(context)
     val history = HistoryRepository(this.database)
-    val session = GatewaySession(scope, profiles)
+    val session = GatewaySession(scope, profiles, demoBootTime = object : DemoBootTimeStore {
+        private val prefs = context.getSharedPreferences("demo", Context.MODE_PRIVATE)
+        override fun load(): Long? = prefs.getLong("booted_at", 0L).takeIf { it > 0 }
+        override fun save(bootedAt: Long) = prefs.edit().putLong("booted_at", bootedAt).apply()
+    })
     val summaries = SummaryStore(context)
     val notifier = Notifier(context)
     val scheduler = Scheduler(context)

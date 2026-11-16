@@ -92,6 +92,25 @@ class DiscoveryAndDemoTest {
     }
 
     @Test
+    fun `demo uptime survives an app restart`() = runTest {
+        var now = 1_700_000_000_000L
+        var stored: Long? = null
+        val store = object : com.banner.hintcontrol.gateway.demo.DemoBootTimeStore {
+            override fun load() = stored
+            override fun save(bootedAt: Long) { stored = bootedAt }
+        }
+        val first = DemoGatewayClient(clock = { now }, latencyMs = 0, bootTime = store)
+        val before = first.mainData().time!!.upTime!!
+        now += 60_000
+        // A new instance stands in for the app being restarted or updated.
+        val second = DemoGatewayClient(clock = { now }, latencyMs = 0, bootTime = store)
+        assertEquals(before + 60, second.mainData().time!!.upTime!!)
+        second.login("admin", DemoGatewayClient.DEMO_PASSWORD)
+        second.reboot()
+        assertEquals(now + 25_000, stored)
+    }
+
+    @Test
     fun `demo gateway behaves like a gateway`() = runTest {
         var now = 1_700_000_000_000L
         val demo = DemoGatewayClient(clock = { now }, latencyMs = 0, rebootDowntimeMs = 20_000)

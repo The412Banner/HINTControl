@@ -4,6 +4,7 @@ import com.banner.hintcontrol.gateway.GatewayClient
 import com.banner.hintcontrol.gateway.GatewayException
 import com.banner.hintcontrol.gateway.GatewayHttp
 import com.banner.hintcontrol.gateway.GatewayKind
+import com.banner.hintcontrol.gateway.demo.DemoBootTimeStore
 import com.banner.hintcontrol.gateway.demo.DemoGatewayClient
 import com.banner.hintcontrol.gateway.nokia.NokiaGatewayClient
 import com.banner.hintcontrol.gateway.tmi.TmiGatewayClient
@@ -38,8 +39,9 @@ class GatewaySession(
     private val scope: CoroutineScope,
     private val profiles: ProfileRepository,
     private val http: OkHttpClient = GatewayHttp.base,
+    demoBootTime: DemoBootTimeStore? = null,
 ) {
-    private val demo = DemoGatewayClient()
+    private val demo = DemoGatewayClient(bootTime = demoBootTime)
     private val lock = Mutex()
     @Volatile private var cache: Pair<String, GatewayClient>? = null
     /** Password typed this session but not saved. */
