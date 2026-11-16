@@ -17,6 +17,12 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~11:20 EST — Firmware upload (feat/firmware-upload, in progress)
+**Why:** user: "go ahead with the firmware upload feature" (plan as proposed: Developer options + G5AR only).
+**Facts it copies (G5AR web page main.05ab12eb.js, /update-gateway):** log in on port 80 (`auth/login`), then POST `/TMI/v1/gateway/upgrade` with headers Accept: application/json, Authorization: Bearer <token>, Cache-Control: no-cache, Content-Type: application/octet-stream and the raw file as body; HTTP 200 = success, 401 = log in again, anything else = fail.
+**Plan:** gateway: GatewayClient.uploadFirmware (default NotSupported), TMI impl (port 80 login + upload, no automatic retry, long timeouts, progress), demo impl (simulated, new version after restart, persisted); app: FirmwareUploader in app scope (upload → wait up to 20 min for restart → firmware before/after via existing tracking), FirmwareScreen (choose file → size + SHA-256 → type INSTALL → progress → result), entry in Gateway details when Developer options on + G5AR/demo; events FirmwareSent/FirmwareSendFailed; tests (MockWebServer, demo, screenshots).
+**Resume point:** branch feat/firmware-upload off main 323858e; nothing committed yet.
+
 ## 2026-11-16 10:44 EST — v1.1.2 released (main, stable/Latest)
 **Why:** user: "add all three to 1.1.2 and release when green" + "yes add the Auto Blocker tip to both".
 **Release:** feat/release-1.1.2 CI 43897312181 GREEN (0a877367, last code commit; later commits = PROGRESS_LOG only) → backup refs/backup/20261116/main-before-1.1.2 = bb6c9c71 → main fast-forwarded to d54a9414 → release run 43898580367 (workflow_dispatch on main, headSha d54a9414) GREEN → v1.1.2 Latest, not prerelease, tag → d54a9414; APK sha256 14ee1060… matches the .sha256 asset; signer AOSP testkey (a40da80a…); versionCode 10 / 1.1.2; notes = release-notes/v1.1.2.md. fix/demo-reboot backed up + deleted (merged).
