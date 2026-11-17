@@ -25,7 +25,8 @@ Newest entry first. Times are US Eastern.
 **Checked:** ClientsData parses 2.4ghz/5.0ghz/6.0ghz/ethernet/wireless/wifi, unknown keys ignored. T-Life 12.4.0 (same APK as the 11-16 study, sha256 6f482d5d…): local ClientInfo = 5.0ghz/2.4ghz/ethernet/wifi only; it groups devices per mesh by connectionInfo.connectedMeshSerialNumber from T-Mobile's cloud data, and RouterMasterData.getGateWayConnectedDevices returns null when isDeviceDataFromLocalFallback. Elite LAN scan of 192.168.12.1-254 on ports 80/8080 (read-only): only the gateway answers.
 **Plan:** install v1.1.4 (release asset, sha256 a6c86904…0d65, staged /sdcard/Download/HintPlus-v1.1.4-a50b9f5a.apk, hash host = device) on the Elite → user logs in → API explorer "Connected devices" (GET network/telemetry/?get=clients, read-only) with the extender on → look for mesh data in the raw JSON.
 **Resume point:** if the session dies: check `dumpsys package com.banner.hintcontrol` on the Elite; if installed and the user logged in, enable Developer options and read Connected devices in the API explorer. Nothing else running.
-**Device test:** NOT device-tested (investigation only).
+**Result 14:00 EST (Pocket FIT Elite, v1.1.4 installed 13:58, sha256 = release; user logged in):** API explorer GET network/telemetry/?get=clients → HTTP 200: 2.4ghz/5.0ghz/ethernet empty, wifi 13 entries (4 connected), item fields only connected/ipv4/ipv6/mac/name/signal, no other keys → the app drops nothing; Devices tab showed the same 13/4. No online entry looks like the extender, so clients behind it were not tested yet. 0 FATAL/ANR for the app.
+**Device test:** read-only API check on the Elite; mesh clients NOT tested (no device known to be behind the extender).
 
 ## 2026-11-17 06:33 EST — v1.1.4 released (main, stable/Latest)
 **Why:** user: "yes fix it and release as stable 1.1.4".
