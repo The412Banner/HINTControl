@@ -19,6 +19,12 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-16 ~22:10 EST — v1.1.3 release cut (fix/devices-main-thread)
+**Why:** user: "release as stable 1.1.3".
+**Built d32b69b0:** versionCode 11 / 1.1.3 + release-notes/v1.1.3.md (credits f1vefour). CI 44008331504 (headSha d32b69b0).
+**Plan:** green → backup refs/backup/20261117/main-before-1.1.3 = 323858e2 → fast-forward main → workflow_dispatch release on main (tag v1.1.3, prerelease false) → verify tag == built commit, APK + .sha256, notes, Latest.
+**Device test:** NOT device-tested (fix proven by HttpTest + CI only).
+
 ## 2026-11-16 ~21:50 EST — Devices "NetworkOnMainThreadException" fix (fix/devices-main-thread, CI green)
 **Why:** user brought 2 screenshots from a Reddit reply on r/tmobile (f1vefour, Pixel 10, Android 17, TMO-G5AR): Devices shows "Something went wrong / NetworkOnMainThreadException" on first open; after switching to another tab and back the devices are listed.
 **Cause (verified in code):** gateway/Http.kt `await()` resumed the coroutine with the open OkHttp Response and read the body after resuming, on the caller's thread. ViewModels call it from viewModelScope (main thread). When the reply hasn't fully arrived with the headers (long device list), the rest is read from the socket on the main thread → Android throws NetworkOnMainThreadException. Small replies are usually already buffered, which is why it is intermittent and mostly hits Devices. Every gateway call goes through await(), so other screens could hit it too.
