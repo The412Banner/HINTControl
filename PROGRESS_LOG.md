@@ -20,6 +20,13 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-17 ~14:00 EST — mesh access point clients (investigation, main, no code change)
+**Why:** Reddit magicianjohn (r/tmobile post 1xxnxgt): Devices doesn't list clients behind the mesh access point (wired or Wi-Fi); the AP itself shows as one Wi-Fi client. The user has an extender on the home G5AR. User: "do it here, i will login after you install the app" (= install on the Pocket FIT Elite).
+**Checked:** ClientsData parses 2.4ghz/5.0ghz/6.0ghz/ethernet/wireless/wifi, unknown keys ignored. T-Life 12.4.0 (same APK as the 11-16 study, sha256 6f482d5d…): local ClientInfo = 5.0ghz/2.4ghz/ethernet/wifi only; it groups devices per mesh by connectionInfo.connectedMeshSerialNumber from T-Mobile's cloud data, and RouterMasterData.getGateWayConnectedDevices returns null when isDeviceDataFromLocalFallback. Elite LAN scan of 192.168.12.1-254 on ports 80/8080 (read-only): only the gateway answers.
+**Plan:** install v1.1.4 (release asset, sha256 a6c86904…0d65, staged /sdcard/Download/HintPlus-v1.1.4-a50b9f5a.apk, hash host = device) on the Elite → user logs in → API explorer "Connected devices" (GET network/telemetry/?get=clients, read-only) with the extender on → look for mesh data in the raw JSON.
+**Resume point:** if the session dies: check `dumpsys package com.banner.hintcontrol` on the Elite; if installed and the user logged in, enable Developer options and read Connected devices in the API explorer. Nothing else running.
+**Device test:** NOT device-tested (investigation only).
+
 ## 2026-11-17 06:33 EST — v1.1.4 released (main, stable/Latest)
 **Why:** user: "yes fix it and release as stable 1.1.4".
 **Release:** fix/silent-auto-refresh CI 44073558088 GREEN 06:28 EST (headSha a50b9f5a; LogicTest + ContainerTest incl. the new spinner check) → backup refs/backup/20261117/main-before-1.1.4 = 28dfcbf1 → main fast-forwarded to a50b9f5a → release run 44074449836 (workflow_dispatch on main, headSha a50b9f5a) GREEN → **v1.1.4 Latest**, not prerelease, published 06:33:24 EST; tag → a50b9f5a6de8b4257bb279ee0f42047825f2a866 (= built commit). Assets HintPlus-v1.1.4-a50b9f5a.apk sha256 a6c86904…0d65 (re-download matches .sha256) + .sha256; signer AOSP testkey a40da80a…f5dc, v1+v2+v3; badging versionCode 12 / 1.1.4; notes == release-notes/v1.1.4.md.
