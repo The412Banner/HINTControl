@@ -3,8 +3,8 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- **2026-11-16 21:54 EST:** fix/devices-main-thread aeb2960d (Devices NetworkOnMainThreadException fix, Reddit Pixel 10 report), CI 44006391609 GREEN; not merged, not released, not device-tested.
-- **Stable v1.1.2 (Latest)** published 2026-11-16 10:44 EST, tag → d54a9414f58178e4803da7e8df243736bbe0d5fa (= release run 43898580367 headSha); assets HintPlus-v1.1.2-d54a9414.apk (sha256 14ee1060…, matches .sha256; AOSP testkey; vc 10) + .sha256. main = d54a9414 (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1,1.1.2}); branch feat/release-1.1.2 = main; fix/demo-reboot deleted (backup refs/backup/20261116/branch/fix/demo-reboot).
+- **Stable v1.1.3 (Latest)** published 2026-11-16 22:22 EST, tag → add8858c (= release run 44009149103 headSha); Devices NetworkOnMainThreadException fix (Reddit f1vefour, Pixel 10/Android 17/G5AR); APK sha256 3b6f6495…; vc 11. NOT device-tested. main = add8858c (+ log commits); backup refs/backup/20261117/main-before-1.1.3 = 323858e2; fix/devices-main-thread still exists (= main).
+- Previous: stable v1.1.2 published 2026-11-16 10:44 EST, tag → d54a9414f58178e4803da7e8df243736bbe0d5fa (= release run 43898580367 headSha); assets HintPlus-v1.1.2-d54a9414.apk (sha256 14ee1060…, matches .sha256; AOSP testkey; vc 10) + .sha256. main = d54a9414 (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1,1.1.2}); branch feat/release-1.1.2 = main; fix/demo-reboot deleted (backup refs/backup/20261116/branch/fix/demo-reboot).
 - 1.1.2 = "did the Wi-Fi change stick" check, firmware change tracking + alert, Samsung Auto Blocker tip (README + updater), demo restart fix. **11:12 EST user updated the FIT 1.1.1 → 1.1.2 through the in-app updater:** installed base.apk sha256 14ee1060… = release asset; crash buffer + FATAL/ANR count 0; firmware.xml holds the G5AR baseline "1.00.06" (tracking works up to the baseline). Not yet seen: a real firmware change event, the "not kept" dialog (needs a Wi-Fi save on the G5AR, ask first), the Samsung tip (no Samsung device).
 - Real TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices, speed test proven (Pocket FIT, Android 14). Android 17 "No gateway found" fixed in 1.1.1, device-proven on a Galaxy Z Fold 8 Ultra; Reddit user confirmed on an S26 Ultra.
 - Open: manual firmware upload (plan proposed, awaiting go; can't be device-tested without a real firmware file; no way to copy the gateway's own firmware), #82 parental controls PARKED by user (format known from T-Life code), Wi-Fi save + reboot on the G5AR (ask first), widget + tile on a device.
@@ -18,6 +18,11 @@ Newest entry first. Times are US Eastern.
 - Polling that stops when the last screen unsubscribes also cancels whatever the poll loop was doing; side effects (history, widget data) must run in the app scope. Found by the end-to-end Robolectric test, not by screenshots.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
+
+## 2026-11-16 22:22 EST — v1.1.3 released (main, stable/Latest)
+**Why:** user: "release as stable 1.1.3".
+**Release:** fix/devices-main-thread CI 44008331504 GREEN (d32b69b0 = release-cut commit; add8858c adds PROGRESS_LOG only) → backup refs/backup/20261117/main-before-1.1.3 = 323858e2 → main fast-forwarded to add8858c → release run 44009149103 (workflow_dispatch on main, headSha add8858c) GREEN → **v1.1.3 Latest**, not prerelease, published 22:22:28 EST; tag → add8858c1d0994dce6c74b9912ca7662df75c863 (= built commit). Assets HintPlus-v1.1.3-add8858c.apk sha256 3b6f6495…f700 (re-download matches .sha256) + .sha256; signer AOSP testkey a40da80a…f5dc, v1+v2+v3 verified; badging versionCode 11 / 1.1.3; notes == release-notes/v1.1.3.md.
+**Device test:** NOT device-tested (fix proven by HttpTest + CI). Users on 1.1.2 get it through the in-app updater. Branch fix/devices-main-thread = main (delete only on user's word, back up first).
 
 ## 2026-11-16 ~22:10 EST — v1.1.3 release cut (fix/devices-main-thread)
 **Why:** user: "release as stable 1.1.3".
