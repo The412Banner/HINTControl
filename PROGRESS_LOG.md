@@ -3,7 +3,7 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- **2026-11-16 21:54 EST:** fix/devices-main-thread aeb2960d (Devices NetworkOnMainThreadException fix, Reddit Pixel 10 report), CI 44006391609; not merged, not released, not device-tested.
+- **2026-11-16 21:54 EST:** fix/devices-main-thread aeb2960d (Devices NetworkOnMainThreadException fix, Reddit Pixel 10 report), CI 44006391609 GREEN; not merged, not released, not device-tested.
 - **Stable v1.1.2 (Latest)** published 2026-11-16 10:44 EST, tag → d54a9414f58178e4803da7e8df243736bbe0d5fa (= release run 43898580367 headSha); assets HintPlus-v1.1.2-d54a9414.apk (sha256 14ee1060…, matches .sha256; AOSP testkey; vc 10) + .sha256. main = d54a9414 (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1,1.1.2}); branch feat/release-1.1.2 = main; fix/demo-reboot deleted (backup refs/backup/20261116/branch/fix/demo-reboot).
 - 1.1.2 = "did the Wi-Fi change stick" check, firmware change tracking + alert, Samsung Auto Blocker tip (README + updater), demo restart fix. **11:12 EST user updated the FIT 1.1.1 → 1.1.2 through the in-app updater:** installed base.apk sha256 14ee1060… = release asset; crash buffer + FATAL/ANR count 0; firmware.xml holds the G5AR baseline "1.00.06" (tracking works up to the baseline). Not yet seen: a real firmware change event, the "not kept" dialog (needs a Wi-Fi save on the G5AR, ask first), the Samsung tip (no Samsung device).
 - Real TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices, speed test proven (Pocket FIT, Android 14). Android 17 "No gateway found" fixed in 1.1.1, device-proven on a Galaxy Z Fold 8 Ultra; Reddit user confirmed on an S26 Ultra.
@@ -19,10 +19,10 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
-## 2026-11-16 ~21:50 EST — Devices "NetworkOnMainThreadException" fix (fix/devices-main-thread, in CI)
+## 2026-11-16 ~21:50 EST — Devices "NetworkOnMainThreadException" fix (fix/devices-main-thread, CI green)
 **Why:** user brought 2 screenshots from a Reddit reply on r/tmobile (f1vefour, Pixel 10, Android 17, TMO-G5AR): Devices shows "Something went wrong / NetworkOnMainThreadException" on first open; after switching to another tab and back the devices are listed.
 **Cause (verified in code):** gateway/Http.kt `await()` resumed the coroutine with the open OkHttp Response and read the body after resuming, on the caller's thread. ViewModels call it from viewModelScope (main thread). When the reply hasn't fully arrived with the headers (long device list), the rest is read from the socket on the main thread → Android throws NetworkOnMainThreadException. Small replies are usually already buffered, which is why it is intermittent and mostly hits Devices. Every gateway call goes through await(), so other screens could hit it too.
-**Fix aeb2960d:** body read inside OkHttp's onResponse (its own thread), then resume with the finished HttpResult; any read error resumes with the exception. New HttpTest (throttled 96 KB reply, records which thread reads the body): FAILS on the old code ("body was read on the calling thread"), passes with the fix; gateway tests 44/44 locally (Elite). CI 44006391609 (headSha aeb2960d).
+**Fix aeb2960d:** body read inside OkHttp's onResponse (its own thread), then resume with the finished HttpResult; any read error resumes with the exception. New HttpTest (throttled 96 KB reply, records which thread reads the body): FAILS on the old code ("body was read on the calling thread"), passes with the fix; gateway tests 44/44 locally (Elite). CI 44006391609 (headSha aeb2960d) GREEN 22:02 EST (all tests + build + screenshots; only "Publish release" skipped, expected).
 **Device test:** NOT device-tested (intermittent; needs a phone on a G5AR).
 **Resume point:** CI 44006391609 green → report to user; release (1.1.3) only on the user's word; Reddit reply drafted for the user to post.
 
