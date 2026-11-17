@@ -79,9 +79,15 @@ class StatusRepository(
         fast.value = on
     }
 
+    /**
+     * One reading. Doesn't set [LiveState.refreshing]: the pull-to-refresh spinner is only for
+     * refreshes the user asked for ([refresh]); automatic reads update the numbers silently.
+     */
     private suspend fun refreshOnce() {
-        val profile = session.active.value ?: return
-        _state.update { it.copy(refreshing = true) }
+        val profile = session.active.value ?: run {
+            _state.update { it.copy(refreshing = false) }
+            return
+        }
         try {
             val main = session.status { it.mainData() }
             val now = System.currentTimeMillis()

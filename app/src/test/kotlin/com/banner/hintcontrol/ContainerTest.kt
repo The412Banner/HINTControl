@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -38,6 +39,24 @@ class ContainerTest {
 
             val live = withTimeout(15_000) { c.status.state.first { it.main != null } }
             assertNotNull(live.main?.signal?.fiveG?.rsrp)
+
+            // Automatic reads update silently; the spinner is only for a refresh the user asked for.
+            c.status.setFastMode(true)
+            val polls = HashSet<Long>()
+            var spinner = false
+            withTimeout(15_000) {
+                c.status.state.first { s ->
+                    if (s.refreshing) spinner = true
+                    s.updatedAt?.let { polls += it }
+                    polls.size >= 3
+                }
+            }
+            c.status.setFastMode(false)
+            assertFalse("spinner shown for an automatic refresh", spinner)
+            val before = c.status.state.value.updatedAt ?: 0L
+            c.status.refresh()
+            assertTrue(c.status.state.value.refreshing)
+            withTimeout(15_000) { c.status.state.first { !it.refreshing && (it.updatedAt ?: 0L) > before } }
             // The poller records a sample on its own, even though this collector has already stopped.
             assertTrue(withTimeout(10_000) { c.history.sampleCount(profile.id).first { it > 0 } } > 0)
             val obs = c.history.observe(profile.id, live.main!!, record = true, minIntervalMs = 0)
