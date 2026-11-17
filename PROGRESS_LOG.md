@@ -19,6 +19,12 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-17 ~06:30 EST — 1.1.4: no refresh spinner on automatic reads (fix/silent-auto-refresh)
+**Why:** Reddit f1vefour (screenshot 06:19 EST): "the little refresh element that appears when a refresh happens is ... causing hitching, I would get rid of it". Verified: StatusRepository.refreshOnce set LiveState.refreshing on every automatic poll (default every 5 s, Settings.kt refreshSeconds = 5) → OverviewScreen PullToRefreshBox (isRefreshing = live.refreshing && main != null) showed the spinner every poll. User: "yes fix it and release as stable 1.1.4".
+**Built:** 530cdb3 refreshOnce no longer sets refreshing (still cleared on success/error; also cleared when no profile); only refresh() (pull, refresh button, Retry, Overview onAction) sets it. ContainerTest: 3 fast-mode polls never set refreshing; manual refresh sets + clears it. ab22924 = release cut (vc 12 / 1.1.4 + release-notes/v1.1.4.md, credits f1vefour). App module can't build locally → CI only.
+**Plan:** CI green → backup refs/backup/20261117/main-before-1.1.4 → FF main → workflow_dispatch release v1.1.4 (prerelease false) → verify.
+**Device test:** NOT device-tested.
+
 ## 2026-11-16 22:22 EST — v1.1.3 released (main, stable/Latest)
 **Why:** user: "release as stable 1.1.3".
 **Release:** fix/devices-main-thread CI 44008331504 GREEN (d32b69b0 = release-cut commit; add8858c adds PROGRESS_LOG only) → backup refs/backup/20261117/main-before-1.1.3 = 323858e2 → main fast-forwarded to add8858c → release run 44009149103 (workflow_dispatch on main, headSha add8858c) GREEN → **v1.1.3 Latest**, not prerelease, published 22:22:28 EST; tag → add8858c1d0994dce6c74b9912ca7662df75c863 (= built commit). Assets HintPlus-v1.1.3-add8858c.apk sha256 3b6f6495…f700 (re-download matches .sha256) + .sha256; signer AOSP testkey a40da80a…f5dc, v1+v2+v3 verified; badging versionCode 11 / 1.1.3; notes == release-notes/v1.1.3.md.
