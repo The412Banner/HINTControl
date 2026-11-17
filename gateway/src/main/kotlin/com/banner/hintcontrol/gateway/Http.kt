@@ -47,11 +47,15 @@ object GatewayHttp {
         .build()
 }
 
-/** Runs the request without blocking a thread; cancelling the coroutine cancels the call. */
+/**
+ * Runs the request without blocking a thread; cancelling the coroutine cancels the call.
+ * The body is read on OkHttp's thread before resuming: reading it after resuming would read the
+ * socket on the caller's thread, which on the main thread throws NetworkOnMainThreadException.
+ */
 suspend fun OkHttpClient.await(request: Request): HttpResult {
     val started = System.nanoTime()
     val call = newCall(request)
-    val response = suspendCancellableCoroutine { cont ->
+    return suspendCancellableCoroutine { cont ->
         cont.invokeOnCancellation { call.cancel() }
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -59,17 +63,22 @@ suspend fun OkHttpClient.await(request: Request): HttpResult {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                cont.resume(response)
+                val result = try {
+                    response.use {
+                        HttpResult(
+                            code = it.code,
+                            headers = it.headers,
+                            body = it.body?.string().orEmpty(),
+                            tookMs = (System.nanoTime() - started) / 1_000_000,
+                        )
+                    }
+                } catch (e: Exception) {
+                    if (cont.isActive) cont.resumeWithException(e)
+                    return
+                }
+                if (cont.isActive) cont.resume(result)
             }
         })
-    }
-    return response.use {
-        HttpResult(
-            code = it.code,
-            headers = it.headers,
-            body = it.body?.string().orEmpty(),
-            tookMs = (System.nanoTime() - started) / 1_000_000,
-        )
     }
 }
 

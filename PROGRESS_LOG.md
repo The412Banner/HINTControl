@@ -3,12 +3,15 @@
 Newest entry first. Times are US Eastern.
 
 ## Resume point
-- **Stable v1.1.2 (Latest)** published 2026-11-16 10:44 EST, tag → d54a9414f58178e4803da7e8df243736bbe0d5fa (= release run 43898580367 headSha); assets HintPlus-v1.1.2-d54a9414.apk (sha256 14ee1060…, matches .sha256; AOSP testkey; vc 10) + .sha256. main = d54a9414 (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1,1.1.2}); branch feat/release-1.1.2 = main; fix/demo-reboot deleted (backup refs/backup/20261116/branch/fix/demo-reboot).
+- **Stable v1.1.4 (Latest)** published 2026-11-17 06:33 EST, tag → a50b9f5a (= release run 44074449836 headSha): refresh spinner no longer shows on automatic reads (Reddit f1vefour); APK sha256 a6c86904…; vc 12. NOT device-tested. Backup refs/backup/20261117/main-before-1.1.4 = 28dfcbf1.
+- Previous: stable v1.1.3 published 2026-11-16 22:22 EST, tag → add8858c (= release run 44009149103 headSha); Devices NetworkOnMainThreadException fix (Reddit f1vefour, Pixel 10/Android 17/G5AR); APK sha256 3b6f6495…; vc 11. NOT device-tested. main = add8858c (+ log commits); backup refs/backup/20261117/main-before-1.1.3 = 323858e2; fix/devices-main-thread still exists (= main).
+- Previous: stable v1.1.2 published 2026-11-16 10:44 EST, tag → d54a9414f58178e4803da7e8df243736bbe0d5fa (= release run 43898580367 headSha); assets HintPlus-v1.1.2-d54a9414.apk (sha256 14ee1060…, matches .sha256; AOSP testkey; vc 10) + .sha256. main = d54a9414 (backups refs/backup/20261116/main-before-{android-compose,1.0.1,1.1.0,1.1.1,1.1.2}); branch feat/release-1.1.2 = main; fix/demo-reboot deleted (backup refs/backup/20261116/branch/fix/demo-reboot).
 - 1.1.2 = "did the Wi-Fi change stick" check, firmware change tracking + alert, Samsung Auto Blocker tip (README + updater), demo restart fix. **11:12 EST user updated the FIT 1.1.1 → 1.1.2 through the in-app updater:** installed base.apk sha256 14ee1060… = release asset; crash buffer + FATAL/ANR count 0; firmware.xml holds the G5AR baseline "1.00.06" (tracking works up to the baseline). Not yet seen: a real firmware change event, the "not kept" dialog (needs a Wi-Fi save on the G5AR, ask first), the Samsung tip (no Samsung device).
 - Real TMO-G5AR (fw 1.00.06): detection, login, status, signal, devices, speed test proven (Pocket FIT, Android 14). Android 17 "No gateway found" fixed in 1.1.1, device-proven on a Galaxy Z Fold 8 Ultra; Reddit user confirmed on an S26 Ultra.
-- Open: manual firmware upload (plan proposed, awaiting go; can't be device-tested without a real firmware file; no way to copy the gateway's own firmware), #82 parental controls PARKED by user (format known from T-Life code), Wi-Fi save + reboot on the G5AR (ask first), widget + tile on a device.
+- Open: manual firmware upload BUILT on feat/firmware-upload (main 1.1.4 merged in 2026-11-17; not merged to main; real G5AR upload can't be device-tested without a real firmware file; no way to copy the gateway's own firmware). The FIT test build c482ab7e was replaced by 1.1.3 through the in-app updater (11-17 04:28 EST); new test build = vc 12 / 1.1.4 base, #82 parental controls PARKED by user (format known from T-Life code), Wi-Fi save + reboot on the G5AR (ask first), widget + tile on a device.
 
 ## Lessons learned (don't repeat these)
+- With suspendCancellableCoroutine + OkHttp enqueue, read the response body inside onResponse; resuming with the open Response moves the socket read to the caller's (main) thread.
 - Back up before deleting, and make the delete depend on the backup succeeding (`backup && delete`); run git refspec loops in bash, not zsh (zsh treats `$var:r…` as a modifier and doesn't word-split `set -- $pair`).
 - Don't declare a permission the app never requests: Android 17 treated Hint Plus's declared-but-unrequested ACCESS_LOCAL_NETWORK as not granted and blocked the gateway on newer phones (apps targeting ≤36 get it implicitly only when they don't declare it).
 - Count upload bytes only when the server confirms them: Android's send buffer takes megabytes at once, so counting at write time reports the buffer, not the link (first real speed test showed 0 Mbps up).
@@ -19,6 +22,40 @@ Newest entry first. Times are US Eastern.
 - Robolectric downloads its Android runtime from Maven Central at test time; a 429 there fails the run. CI caches ~/.m2/repository/org/robolectric and pre-fetches with retries.
 - On forks, workflow_dispatch only sees workflows on the default branch → build on push to feat/** instead.
 
+## 2026-11-17 ~06:50 EST — main (1.1.3 + 1.1.4) merged into feat/firmware-upload
+**Why:** while the FIT was lent to another session overnight, Hint Plus updated itself 1.1.2 test build c482ab7e → 1.1.3 (installer com.banner.hintcontrol, lastUpdateTime 11-17 04:28:32 EST; installed sha256 3b6f6495… = v1.1.3 asset). The firmware branch was still on 1.1.2 (vc 10), so its test build could no longer be installed over the app without a downgrade, and it lacked the 1.1.3/1.1.4 fixes.
+**Done:** backup refs/backup/20261117/branch/feat/firmware-upload-before-main-merge = 9695e49 (pushed); `git merge --no-ff origin/main` (a50b9f5a + log commits). Only PROGRESS_LOG.md conflicted (both sides' entries kept, newest first). Checked by hand: TmiGatewayClient.uploadFirmware uses HttpResult from `await()`, whose signature main kept (main only moved the body read into onResponse); StatusRepository (onObservation + silent refreshOnce) and ContainerTest (firmware upload + spinner check) merged without conflict.
+**Next:** CI on the merged branch → stage the vc 12 test APK in /sdcard/Download (internal storage, not the SD card, which root-d8 asked to leave alone for undelete) → ask the user before installing.
+**Device test:** NOT device-tested.
+
+## 2026-11-17 06:33 EST — v1.1.4 released (main, stable/Latest)
+**Why:** user: "yes fix it and release as stable 1.1.4".
+**Release:** fix/silent-auto-refresh CI 44073558088 GREEN 06:28 EST (headSha a50b9f5a; LogicTest + ContainerTest incl. the new spinner check) → backup refs/backup/20261117/main-before-1.1.4 = 28dfcbf1 → main fast-forwarded to a50b9f5a → release run 44074449836 (workflow_dispatch on main, headSha a50b9f5a) GREEN → **v1.1.4 Latest**, not prerelease, published 06:33:24 EST; tag → a50b9f5a6de8b4257bb279ee0f42047825f2a866 (= built commit). Assets HintPlus-v1.1.4-a50b9f5a.apk sha256 a6c86904…0d65 (re-download matches .sha256) + .sha256; signer AOSP testkey a40da80a…f5dc, v1+v2+v3; badging versionCode 12 / 1.1.4; notes == release-notes/v1.1.4.md.
+**Device test:** NOT device-tested. Branches fix/silent-auto-refresh + fix/devices-main-thread still exist (merged; delete only on user's word, back up first).
+
+## 2026-11-17 ~06:30 EST — 1.1.4: no refresh spinner on automatic reads (fix/silent-auto-refresh)
+**Why:** Reddit f1vefour (screenshot 06:19 EST): "the little refresh element that appears when a refresh happens is ... causing hitching, I would get rid of it". Verified: StatusRepository.refreshOnce set LiveState.refreshing on every automatic poll (default every 5 s, Settings.kt refreshSeconds = 5) → OverviewScreen PullToRefreshBox (isRefreshing = live.refreshing && main != null) showed the spinner every poll. User: "yes fix it and release as stable 1.1.4".
+**Built:** 530cdb3 refreshOnce no longer sets refreshing (still cleared on success/error; also cleared when no profile); only refresh() (pull, refresh button, Retry, Overview onAction) sets it. ContainerTest: 3 fast-mode polls never set refreshing; manual refresh sets + clears it. ab22924 = release cut (vc 12 / 1.1.4 + release-notes/v1.1.4.md, credits f1vefour). App module can't build locally → CI only.
+**Plan:** CI green → backup refs/backup/20261117/main-before-1.1.4 → FF main → workflow_dispatch release v1.1.4 (prerelease false) → verify.
+**Device test:** NOT device-tested.
+
+## 2026-11-16 22:22 EST — v1.1.3 released (main, stable/Latest)
+**Why:** user: "release as stable 1.1.3".
+**Release:** fix/devices-main-thread CI 44008331504 GREEN (d32b69b0 = release-cut commit; add8858c adds PROGRESS_LOG only) → backup refs/backup/20261117/main-before-1.1.3 = 323858e2 → main fast-forwarded to add8858c → release run 44009149103 (workflow_dispatch on main, headSha add8858c) GREEN → **v1.1.3 Latest**, not prerelease, published 22:22:28 EST; tag → add8858c1d0994dce6c74b9912ca7662df75c863 (= built commit). Assets HintPlus-v1.1.3-add8858c.apk sha256 3b6f6495…f700 (re-download matches .sha256) + .sha256; signer AOSP testkey a40da80a…f5dc, v1+v2+v3 verified; badging versionCode 11 / 1.1.3; notes == release-notes/v1.1.3.md.
+**Device test:** NOT device-tested (fix proven by HttpTest + CI). Users on 1.1.2 get it through the in-app updater. Branch fix/devices-main-thread = main (delete only on user's word, back up first).
+
+## 2026-11-16 ~22:10 EST — v1.1.3 release cut (fix/devices-main-thread)
+**Why:** user: "release as stable 1.1.3".
+**Built d32b69b0:** versionCode 11 / 1.1.3 + release-notes/v1.1.3.md (credits f1vefour). CI 44008331504 (headSha d32b69b0).
+**Plan:** green → backup refs/backup/20261117/main-before-1.1.3 = 323858e2 → fast-forward main → workflow_dispatch release on main (tag v1.1.3, prerelease false) → verify tag == built commit, APK + .sha256, notes, Latest.
+**Device test:** NOT device-tested (fix proven by HttpTest + CI only).
+
+## 2026-11-16 ~21:50 EST — Devices "NetworkOnMainThreadException" fix (fix/devices-main-thread, CI green)
+**Why:** user brought 2 screenshots from a Reddit reply on r/tmobile (f1vefour, Pixel 10, Android 17, TMO-G5AR): Devices shows "Something went wrong / NetworkOnMainThreadException" on first open; after switching to another tab and back the devices are listed.
+**Cause (verified in code):** gateway/Http.kt `await()` resumed the coroutine with the open OkHttp Response and read the body after resuming, on the caller's thread. ViewModels call it from viewModelScope (main thread). When the reply hasn't fully arrived with the headers (long device list), the rest is read from the socket on the main thread → Android throws NetworkOnMainThreadException. Small replies are usually already buffered, which is why it is intermittent and mostly hits Devices. Every gateway call goes through await(), so other screens could hit it too.
+**Fix aeb2960d:** body read inside OkHttp's onResponse (its own thread), then resume with the finished HttpResult; any read error resumes with the exception. New HttpTest (throttled 96 KB reply, records which thread reads the body): FAILS on the old code ("body was read on the calling thread"), passes with the fix; gateway tests 44/44 locally (Elite). CI 44006391609 (headSha aeb2960d) GREEN 22:02 EST (all tests + build + screenshots; only "Publish release" skipped, expected).
+**Device test:** NOT device-tested (intermittent; needs a phone on a G5AR).
+**Resume point:** CI 44006391609 green → report to user; release (1.1.3) only on the user's word; Reddit reply drafted for the user to post.
 ## 2026-11-16 ~11:20 EST — Firmware upload (feat/firmware-upload, in progress)
 **Why:** user: "go ahead with the firmware upload feature" (plan as proposed: Developer options + G5AR only).
 **Facts it copies (G5AR web page main.05ab12eb.js, /update-gateway):** log in on port 80 (`auth/login`), then POST `/TMI/v1/gateway/upgrade` with headers Accept: application/json, Authorization: Bearer <token>, Cache-Control: no-cache, Content-Type: application/octet-stream and the raw file as body; HTTP 200 = success, 401 = log in again, anything else = fail.
